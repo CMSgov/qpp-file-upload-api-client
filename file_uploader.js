@@ -91,16 +91,11 @@ const getExistingSubmission = function(submission, baseSubmissionURL, JWT) {
   };
 
   // Make a string of URL-encoded query parameters
-  let url;
-  if (queryParams) {
-    const queryParamString = Object.keys(queryParams).map((key) => {
-      return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
-    }).join('&');
+  const queryParamString = Object.keys(queryParams).map((key) => {
+    return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
+  }).join('&');
 
-    url = baseSubmissionURL + '/submissions?' + queryParamString;
-  } else {
-    url = baseSubmissionURL + '/submissions';
-  };
+  url = baseSubmissionURL + '/submissions?' + queryParamString;
 
   const getSubmissionsOptions = {
     url: url,
