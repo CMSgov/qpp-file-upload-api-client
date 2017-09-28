@@ -156,11 +156,16 @@ const putMeasurementSet = function(url, measurementSet, JWT) {
   };
 
   return rp.put(putMeasurementSetOptions)
-    .then(function(response) {
+    .then(function(err, response, body) {
+      if (err) return [err, null];
+
       if (response.statusCode !== 200) {
         return ['PUT /measurement-sets failed: ' + response.body, null];
       }
       return [null, JSON.parse(response.body)];
+    })
+    .catch((err) => {
+      return [err, null];
     });
 };
 
@@ -185,11 +190,16 @@ const postMeasurementSet = function(url, measurementSet, JWT) {
   };
 
   return rp.post(postMeasurementSetOptions)
-    .then(function(response) {
+    .then(function(err, response, body) {
+      if (err) return [err, null];
+
       if (response.statusCode !== 201) {
         return ['PUT /measurement-sets failed: ' + response.body, null];
       }
       return [null, JSON.parse(response.body)];
+    })
+    .catch((err) => {
+      return [err, null];
     });
 };
 
@@ -215,7 +225,7 @@ const submitMeasurementSets = function(existingSubmission, submission, baseSubmi
     let err;
     let newMeasurementSet;
 
-    // If there's an existing su bmission, then the measurementSet to submit needs the
+    // If there's an existing submission, then the measurementSet to submit needs the
     // submissionId in it. If not, we put the submission object in the measurementSet
     if (existingSubmission) {
       measurementSetToSubmit = Object.assign({}, measurementSet, {submissionId: existingSubmission.id});
@@ -265,7 +275,7 @@ const submitMeasurementSets = function(existingSubmission, submission, baseSubmi
  */
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let submission;
-  parseSubmission(submissionBody, submissionFormat)
+  return parseSubmission(submissionBody, submissionFormat)
     .then(function(parsedSubmissionObject) {
       submission = parsedSubmissionObject;
 
