@@ -38,22 +38,13 @@ const parseSubmission = function(submissionBody, submissionFormat) {
  * we throw an error
  *
  * @param {Object} submission
- * @param {String} baseSubmissionURL
- * @param {String} JWT
+ * @param {Object} baseOptions
  */
-const validateSubmission = function(submission, baseSubmissionURL, JWT) {
-  const url = baseSubmissionURL + '/submissions/validate';
-
-  const validateSubmissionOptions = {
-    url: url,
-    headers: {
-      'Authorization': 'Bearer ' + JWT,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(submission),
-    resolveWithFullResponse: true
-  };
+const validateSubmission = function(submission, baseOptions) {
+  const validateSubmissionOptions = Object.assign({}, baseOptions, {
+    url: baseOptions.url + '/submissions/validate',
+    body: JSON.stringify(submission)
+  });
 
   return rp.post(validateSubmissionOptions)
     .then((response) => {
@@ -75,11 +66,10 @@ const validateSubmission = function(submission, baseSubmissionURL, JWT) {
  * entityType here to find a single matching submission
  *
  * @param {Object} submission
- * @param {String} baseSubmissionURL
- * @param {String} JWT
+ * @param {Object} baseOptions
  * @return {Object}
  */
-const getExistingSubmission = function(submission, baseSubmissionURL, JWT) {
+const getExistingSubmission = function(submission, baseOptions) {
   const queryParams = {};
 
   if (submission.nationalProviderIdentifier) {
@@ -95,18 +85,10 @@ const getExistingSubmission = function(submission, baseSubmissionURL, JWT) {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
   }).join('&');
 
-  url = baseSubmissionURL + '/submissions?' + queryParamString;
-
-  const getSubmissionsOptions = {
-    url: url,
-    headers: {
-      'Authorization': 'Bearer ' + JWT,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
-    },
-    resolveWithFullResponse: true
-  };
+  // Have to do a deep copy here because we're changing a nested Object
+  const getSubmissionsOptions = JSON.parse(JSON.stringify(baseOptions));
+  getSubmissionsOptions.url = baseOptions.url + '/submissions?' + queryParamString;
+  getSubmissionsOptions.headers['qpp-taxpayer-identification-number'] = submission.taxpayerIdentificationNumber;
 
   return rp.get(getSubmissionsOptions)
     .then((response) => {
@@ -139,22 +121,16 @@ const getExistingSubmission = function(submission, baseSubmissionURL, JWT) {
  * Function for calling PUT /measurement-sets on the Submissions API. Expects
  * a 200 status code.
  *
- * @param {String} url
  * @param {Object} measurementSet
- * @param {String} JWT
+ * @param {Object} baseOptions
+ * @param {String} measurementSetId
  * @return {Array<String, Object>}
  */
-const putMeasurementSet = function(url, measurementSet, JWT) {
-  const putMeasurementSetOptions = {
-    url: url,
-    headers: {
-      'Authorization': 'Bearer ' + JWT,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(measurementSet),
-    resolveWithFullResponse: true
-  };
+const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId) {
+  const putMeasurementSetOptions = Object.assign({}, baseOptions, {
+    url: baseOptions.url + '/measurement-sets/' + measurementSetId,
+    body: JSON.stringify(measurementSet)
+  });
 
   return rp.put(putMeasurementSetOptions)
     .then((response) => {
@@ -172,22 +148,15 @@ const putMeasurementSet = function(url, measurementSet, JWT) {
  * Function for calling POST /measurement-sets on the Submissions API. Expects
  * a 201 status code.
  *
- * @param {String} url
  * @param {Object} measurementSet
- * @param {String} JWT
+ * @param {Object} baseOptions
  * @return {Array<String, Object>}
  */
-const postMeasurementSet = function(url, measurementSet, JWT) {
-  const postMeasurementSetOptions = {
-    url: url,
-    headers: {
-      'Authorization': 'Bearer ' + JWT,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(measurementSet),
-    resolveWithFullResponse: true
-  };
+const postMeasurementSet = function(measurementSet, baseOptions) {
+  const postMeasurementSetOptions = Object.assign({}, baseOptions, {
+    url: baseOptions.url + '/measurement-sets',
+    body: JSON.stringify(measurementSet)
+  });
 
   return rp.post(postMeasurementSetOptions)
     .then((response) => {
@@ -211,11 +180,10 @@ const postMeasurementSet = function(url, measurementSet, JWT) {
  *
  * @param {Object} existingSubmission
  * @param {Object} submission
- * @param {String} baseSubmissionURL
- * @param {String} JWT
+ * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-const submitMeasurementSets = function(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT) {
+const submitMeasurementSets = function(existingSubmission, submission, measurementSetsToCreate, baseOptions) {
   const promises = [];
   measurementSetsToCreate.forEach((measurementSet) => {
     let measurementSetToSubmit;
@@ -247,12 +215,10 @@ const submitMeasurementSets = function(existingSubmission, submission, measureme
     if (matchingMeasurementSets.length > 0) {
       // Do a PUT
       const matchingMeasurementSetId = matchingMeasurementSets[0].id;
-      const putURL = baseSubmissionURL + '/measurement-sets/' + matchingMeasurementSetId;
-      promises.push(putMeasurementSet(putURL, measurementSetToSubmit, JWT));
+      promises.push(putMeasurementSet(measurementSetToSubmit, baseOptions, matchingMeasurementSetId));
     } else {
       // Do a POST
-      const postURL = baseSubmissionURL + '/measurement-sets';
-      promises.push(postMeasurementSet(postURL, measurementSetToSubmit, JWT));
+      promises.push(postMeasurementSet(measurementSetToSubmit, baseOptions));
     };
   });
 
@@ -277,6 +243,16 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
   const errs = [];
   const createdMeasurementSets = [];
 
+  const baseOptions = {
+    url: baseSubmissionURL,
+    headers: {
+      'Authorization': 'Bearer ' + JWT,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    resolveWithFullResponse: true
+  };
+
   return parseSubmission(submissionBody, submissionFormat)
     .then((parsedSubmissionObject) => {
       submission = Object.assign({}, parsedSubmissionObject, {measurementSets: []});
@@ -286,9 +262,9 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
         throw new Error('At least one measurementSet must be defined to use this functionality');
       };
 
-      return validateSubmission(parsedSubmissionObject, baseSubmissionURL, JWT);
+      return validateSubmission(parsedSubmissionObject, baseOptions);
     }).then(() => {
-      return getExistingSubmission(submission, baseSubmissionURL, JWT);
+      return getExistingSubmission(submission, baseOptions);
     }).then((existingSubmission) => {
       let firstMeasurementSetPromise;
 
@@ -305,7 +281,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
           nationalProviderIdentifier: submission.nationalProviderIdentifier || null,
           performanceYear: submission.performanceYear
         }});
-        firstMeasurementSetPromise = postMeasurementSet(baseSubmissionURL + '/measurement-sets', firstMeasurementSet, JWT);
+        firstMeasurementSetPromise = postMeasurementSet(firstMeasurementSet, baseOptions);
       };
 
       return Promise.all([existingSubmission, firstMeasurementSetPromise]);
@@ -323,7 +299,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       };
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT);
+      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseOptions);
       return Promise.all(postAndPutPromises);
     }).then((postAndPutOutputs) => {
       // Aggregate the errors and created measurementSets
