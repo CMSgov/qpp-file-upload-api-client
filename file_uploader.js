@@ -148,7 +148,8 @@ const putMeasurementSet = function(url, measurementSet, JWT) {
   const putMeasurementSetOptions = {
     url: url,
     headers: {
-      'Authorization': 'Bearer ' + JWT, 'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + JWT,
+      'Content-Type': 'application/json',
       'Accept': 'application/json'
     },
     body: JSON.stringify(measurementSet),
@@ -180,7 +181,8 @@ const postMeasurementSet = function(url, measurementSet, JWT) {
   const postMeasurementSetOptions = {
     url: url,
     headers: {
-      'Authorization': 'Bearer ' + JWT, 'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + JWT,
+      'Content-Type': 'application/json',
       'Accept': 'application/json'
     },
     body: JSON.stringify(measurementSet),
@@ -213,9 +215,9 @@ const postMeasurementSet = function(url, measurementSet, JWT) {
  * @param {String} JWT
  * @return {Array<Promise>}
  */
-const submitMeasurementSets = function(existingSubmission, submission, baseSubmissionURL, JWT) {
+const submitMeasurementSets = function(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT) {
   const promises = [];
-  submission.measurementSets.forEach((measurementSet) => {
+  measurementSetsToCreate.forEach((measurementSet) => {
     let measurementSetToSubmit;
     let existingMeasurementSets = [];
     let err;
@@ -271,23 +273,61 @@ const submitMeasurementSets = function(existingSubmission, submission, baseSubmi
  */
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let submission;
-  return parseSubmission(submissionBody, submissionFormat)
-    .then(function(parsedSubmissionObject) {
-      submission = parsedSubmissionObject;
+  let measurementSetsToCreate;
+  let firstMeasurementSetOutput;
 
-      if (!submission.measurementSets || submission.measurementSets.length === 0) {
+  return parseSubmission(submissionBody, submissionFormat)
+    .then((parsedSubmissionObject) => {
+      submission = Object.assign({}, parsedSubmissionObject, {measurementSets: []});
+      measurementSetsToCreate = parsedSubmissionObject.measurementSets;
+
+      if (!measurementSetsToCreate || measurementSetsToCreate.length === 0) {
         throw new Error('At least one measurementSet must be defined to use this functionality');
       };
 
       return validateSubmission(parsedSubmissionObject, baseSubmissionURL, JWT);
     }).then(() => {
       return getExistingSubmission(submission, baseSubmissionURL, JWT);
-    }).then(function(existingSubmission) {
-      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, baseSubmissionURL, JWT);
+    }).then((existingSubmission) => {
+      let firstMeasurementSetPromise;
+
+      if (!existingSubmission) {
+        const firstMeasurementSet = Object.assign({}, measurementSetsToCreate.pop(), {submission: {
+          programName: submission.programName,
+          entityType: submission.entityType,
+          entityId: submission.entityId || null,
+          taxpayerIdentificationNumber: submission.taxpayerIdentificationNumber,
+          nationalProviderIdentifier: submission.nationalProviderIdentifier || null,
+          performanceYear: submission.performanceYear
+        }});
+        firstMeasurementSetPromise = postMeasurementSet(baseSubmissionURL + '/measurement-sets', firstMeasurementSet, JWT);
+      };
+
+      return Promise.all([existingSubmission, firstMeasurementSetPromise]);
+    }).spread((existingSubmission, firstMeasurementSet) => {
+      firstMeasurementSetOutput = firstMeasurementSet;
+
+      if (firstMeasurementSetOutput && firstMeasurementSetOutput[0]) {
+        throw new Error('Could not create first measurementSet: ' + JSON.stringify(firstMeasurementSetOutput[0]));
+      };
+
+      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT);
       return Promise.all(postAndPutPromises);
     }).then((postAndPutOutputs) => {
       const errs = [];
       const createdMeasurementSets = [];
+
+      // Add the results of the first measurementSet POST, if we did it separately from
+      // the other measurementSets
+      if (firstMeasurementSetOutput) {
+        if (firstMeasurementSetOutput[0]) {
+          errs.push(firstMeasurementSetOutput[0]);
+        };
+
+        if (firstMeasurementSetOutput[1]) {
+          createdMeasurementSets.push(firstMeasurementSetOutput[1]);
+        };
+      };
 
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
