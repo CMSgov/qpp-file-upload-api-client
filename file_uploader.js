@@ -1,4 +1,3 @@
-const Q = require('q');
 const rp = require('request-promise');
 const parseString = require('xml2js').parseString;
 
@@ -13,23 +12,21 @@ const parseString = require('xml2js').parseString;
  * @return {Promise}
  */
 const parseSubmission = function(submissionBody, submissionFormat) {
-  deferred = Q.defer();
+  return new Promise((resolve, reject) => {
+    if (submissionFormat === 'JSON') {
+      const submission = JSON.parse(submissionBody)
+      resolve(submission);
+    } else if (submissionFormat === 'XML') {
+      // Use xml2js to parse the XML body
+      parseString(submissionBody, (err, submission) => {
+        if (err) return deferred.reject(new Error('Invalid XML'));
 
-  if (submissionFormat === 'JSON') {
-    const submission = JSON.parse(submissionBody)
-    deferred.resolve(submission);
-  } else if (submissionFormat === 'XML') {
-    // Use xml2js to parse the XML body
-    parseString(submissionBody, (err, submission) => {
-      if (err) return deferred.reject(new Error('Invalid XML'));
-
-      return deferred.resolve(submission);
-    });
-  } else {
-    deferred.reject(new Error('Invalid format'));
-  };
-  
-  return deferred.promise;
+        resolve(submission);
+      });
+    } else {
+      reject(new Error('Invalid format'));
+    };
+  });
 };
 
 /*
@@ -239,6 +236,7 @@ const submitMeasurementSets = function(existingSubmission, submission, measureme
  */
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let submission;
+  let existingSubmission
   let measurementSetsToCreate;
   const errs = [];
   const createdMeasurementSets = [];
@@ -265,7 +263,8 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       return validateSubmission(parsedSubmissionObject, baseOptions);
     }).then(() => {
       return getExistingSubmission(submission, baseOptions);
-    }).then((existingSubmission) => {
+    }).then((existingSubmissionReturned) => {
+      existingSubmission = existingSubmissionReturned
       let firstMeasurementSetPromise;
 
       // If there is no existing submission, we want to do one POST /measurement-sets call
@@ -284,8 +283,8 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
         firstMeasurementSetPromise = postMeasurementSet(firstMeasurementSet, baseOptions);
       };
 
-      return Promise.all([existingSubmission, firstMeasurementSetPromise]);
-    }).spread((existingSubmission, firstMeasurementSetOutput) => {
+      return firstMeasurementSetPromise;
+    }).then((firstMeasurementSetOutput) => {
       // If we did fire off the first POST /measurement-sets call and it resulted in an
       // error, throw it here before trying the others
       if (firstMeasurementSetOutput) {
