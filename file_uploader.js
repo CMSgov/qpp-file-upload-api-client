@@ -274,7 +274,8 @@ const submitMeasurementSets = function(existingSubmission, submission, measureme
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let submission;
   let measurementSetsToCreate;
-  let firstMeasurementSetOutput;
+  const errs = [];
+  const createdMeasurementSets = [];
 
   return parseSubmission(submissionBody, submissionFormat)
     .then((parsedSubmissionObject) => {
@@ -291,6 +292,10 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
     }).then((existingSubmission) => {
       let firstMeasurementSetPromise;
 
+      // If there is no existing submission, we want to do one POST /measurement-sets call
+      // first and let it fully finish so it can create the new Submission and not compete
+      // with other POST /measurement-sets calls to create the submission, which can cause
+      // errors
       if (!existingSubmission) {
         const firstMeasurementSet = Object.assign({}, measurementSetsToCreate.pop(), {submission: {
           programName: submission.programName,
@@ -304,24 +309,12 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       };
 
       return Promise.all([existingSubmission, firstMeasurementSetPromise]);
-    }).spread((existingSubmission, firstMeasurementSet) => {
-      firstMeasurementSetOutput = firstMeasurementSet;
-
-      if (firstMeasurementSetOutput && firstMeasurementSetOutput[0]) {
-        throw new Error('Could not create first measurementSet: ' + JSON.stringify(firstMeasurementSetOutput[0]));
-      };
-
-      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT);
-      return Promise.all(postAndPutPromises);
-    }).then((postAndPutOutputs) => {
-      const errs = [];
-      const createdMeasurementSets = [];
-
-      // Add the results of the first measurementSet POST, if we did it separately from
-      // the other measurementSets
+    }).spread((existingSubmission, firstMeasurementSetOutput) => {
+      // If we did fire off the first POST /measurement-sets call and it resulted in an
+      // error, throw it here before trying the others
       if (firstMeasurementSetOutput) {
         if (firstMeasurementSetOutput[0]) {
-          errs.push(firstMeasurementSetOutput[0]);
+          throw new Error('Could not create first measurementSet: ' + JSON.stringify(firstMeasurementSetOutput[0]));
         };
 
         if (firstMeasurementSetOutput[1]) {
@@ -329,6 +322,10 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
         };
       };
 
+      // Submit all remaining measurementSets
+      const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseSubmissionURL, JWT);
+      return Promise.all(postAndPutPromises);
+    }).then((postAndPutOutputs) => {
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
         if (postOrPutOutput[0]) {
