@@ -20,7 +20,7 @@ const parseSubmission = function(submissionBody, submissionFormat) {
     deferred.resolve(submission);
   } else if (submissionFormat === 'XML') {
     // Use xml2js to parse the XML body
-    parseString(submissionBody, function(err, submission) {
+    parseString(submissionBody, (err, submission) => {
       if (err) return deferred.reject(new Error('Invalid XML'));
 
       return deferred.resolve(submission);
@@ -56,7 +56,7 @@ const validateSubmission = function(submission, baseSubmissionURL, JWT) {
   };
 
   return rp.post(validateSubmissionOptions)
-    .then(function(response) {
+    .then((response) => {
       if (response.statusCode === 204) return;
 
       // TODO(sam): Add error from response with paths and whatnot
@@ -109,7 +109,7 @@ const getExistingSubmission = function(submission, baseSubmissionURL, JWT) {
   };
 
   return rp.get(getSubmissionsOptions)
-    .then(function(response) {
+    .then((response) => {
       if (response.statusCode !== 200) {
         throw new Error('Could not fetch existing Submissions');
       };
@@ -156,9 +156,7 @@ const putMeasurementSet = function(url, measurementSet, JWT) {
   };
 
   return rp.put(putMeasurementSetOptions)
-    .then(function(err, response, body) {
-      if (err) return [err, null];
-
+    .then((response) => {
       if (response.statusCode !== 200) {
         return ['PUT /measurement-sets failed: ' + response.body, null];
       }
@@ -190,9 +188,7 @@ const postMeasurementSet = function(url, measurementSet, JWT) {
   };
 
   return rp.post(postMeasurementSetOptions)
-    .then(function(err, response, body) {
-      if (err) return [err, null];
-
+    .then((response) => {
       if (response.statusCode !== 201) {
         return ['PUT /measurement-sets failed: ' + response.body, null];
       }
@@ -284,12 +280,12 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       };
 
       return validateSubmission(parsedSubmissionObject, baseSubmissionURL, JWT);
-    }).then(function() {
+    }).then(() => {
       return getExistingSubmission(submission, baseSubmissionURL, JWT);
     }).then(function(existingSubmission) {
       const postAndPutPromises = submitMeasurementSets(existingSubmission, submission, baseSubmissionURL, JWT);
       return Promise.all(postAndPutPromises);
-    }).then(function(postAndPutOutputs) {
+    }).then((postAndPutOutputs) => {
       const errs = [];
       const createdMeasurementSets = [];
 
@@ -307,7 +303,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
 
       // Call the callback with the aggregated error string and list of measurementSets created
       callback(errString, createdMeasurementSets);
-    }).catch(function(err) {
+    }).catch((err) => {
       // Call the callback with the aggregated error string and an empty list (no measurementSets created)
       callback(err, []);
     }); 
