@@ -82,10 +82,13 @@ const getExistingSubmission = function(submission, baseOptions) {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
   }).join('&');
 
-  // Have to do a deep copy here because we're changing a nested Object
-  const getSubmissionsOptions = JSON.parse(JSON.stringify(baseOptions));
-  getSubmissionsOptions.url = baseOptions.url + '/submissions?' + queryParamString;
-  getSubmissionsOptions.headers['qpp-taxpayer-identification-number'] = submission.taxpayerIdentificationNumber;
+  const getSubmissionsOptions = Object.assign({}, baseOptions, {
+    url: baseOptions.url + '/submissions?' + queryParamString,
+    headers: {
+      ...baseOptions.headers,
+      'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
+    }
+  });
 
   return rp.get(getSubmissionsOptions)
     .then((response) => {
