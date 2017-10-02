@@ -1,33 +1,4 @@
 const rp = require('request-promise');
-const parseString = require('xml2js').parseString;
-
-/*
- * Function for parsing the submission body, provided as a string in
- * JSON or XML, and returning a JS Object. We use the Q module to
- * make it easy to promisify this function, which is nice because
- * parseString() uses a callback
- *
- * @param {String} submissionBody
- * @param {String} submissionFormat
- * @return {Promise}
- */
-const parseSubmission = function(submissionBody, submissionFormat) {
-  return new Promise((resolve, reject) => {
-    if (submissionFormat === 'JSON') {
-      const submission = JSON.parse(submissionBody)
-      resolve(submission);
-    } else if (submissionFormat === 'XML') {
-      // Use xml2js to parse the XML body
-      parseString(submissionBody, (err, submission) => {
-        if (err) return deferred.reject(new Error('Invalid XML'));
-
-        resolve(submission);
-      });
-    } else {
-      reject(new Error('Invalid format'));
-    };
-  });
-};
 
 /*
  * Function for validating a submission Object using the /submissions/validate
@@ -37,15 +8,30 @@ const parseSubmission = function(submissionBody, submissionFormat) {
  * @param {Object} submission
  * @param {Object} baseOptions
  */
-const validateSubmission = function(submission, baseOptions) {
+const validateSubmission = function(submission, submissionFormat, baseOptions) {
+  const headers = Object.assign({}, baseOptions.headers);
+
+  // We're going to receive JSON from the Submissions API with the submission object
+  // in the response -- this allows us to convert between QPP XML and QPP JSON without
+  // having to do any XML parsing in this module.
+  if (submissionFormat === 'XML') {
+    headers['Content-Type'] = 'application/xml';
+  } else if (submissionFormat === 'JSON') {
+    // This is already defined in the headers, but just making it explicit here
+    headers['Content-Type'] = 'application/json';
+  } else {
+    throw new Error('Invalid format');
+  };
+
   const validateSubmissionOptions = Object.assign({}, baseOptions, {
     url: baseOptions.url + '/submissions/validate',
-    body: JSON.stringify(submission)
+    headers: headers,
+    body: submission
   });
 
   return rp.post(validateSubmissionOptions)
     .then((response) => {
-      if (response.statusCode === 204) return;
+      if (response.statusCode === 200) return JSON.parse(response.body)['data']['submission'];
 
       // TODO(sam): Add error from response with paths and whatnot
       throw new Error('Invalid Submission Object');
@@ -254,17 +240,14 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
     resolveWithFullResponse: true
   };
 
-  return parseSubmission(submissionBody, submissionFormat)
-    .then((parsedSubmissionObject) => {
-      submission = Object.assign({}, parsedSubmissionObject, {measurementSets: []});
-      measurementSetsToCreate = parsedSubmissionObject.measurementSets;
+  return validateSubmission(submissionBody, submissionFormat, baseOptions)
+    .then((validSubmission) => {
+      submission = Object.assign({}, validSubmission, {measurementSets: []});
+      measurementSetsToCreate = validSubmission.measurementSets;
 
       if (!measurementSetsToCreate || measurementSetsToCreate.length === 0) {
         throw new Error('At least one measurementSet must be defined to use this functionality');
       };
-
-      return validateSubmission(parsedSubmissionObject, baseOptions);
-    }).then(() => {
       return getExistingSubmission(submission, baseOptions);
     }).then((existingSubmissionReturned) => {
       existingSubmission = existingSubmissionReturned
