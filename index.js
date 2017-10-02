@@ -1,7 +1,7 @@
 /*
  * Module Dependencies
  */
-const fileUploader = require('./file_uploader');
+const fileUploader = require('./file-uploader');
 
 /*
  * Module Exports

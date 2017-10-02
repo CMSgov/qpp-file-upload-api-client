@@ -4,7 +4,7 @@
   "description": "An npm package to send the necessary requests to the Submissions API to execute the functionality required by a file upload client\"",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "mocha --recursive test"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,9 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "sinon": "^4.0.0"
+  }
 }
