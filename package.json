@@ -1,7 +1,7 @@
 {
   "name": "@cmsgov/qpp-file-upload-api-client",
   "version": "1.0.0",
-  "description": "An npm package to send the necessary requests to the Submissions API to execute the functionality required by a file upload client\"",
+  "description": "An npm package to send the necessary requests to the Submissions API to execute the functionality required by a file upload client",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive test"

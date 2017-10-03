@@ -41,7 +41,6 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       // first and let it fully finish so it can create the new Submission and not compete
       // with other POST /measurement-sets calls to create the submission, which can cause
       // errors
-      //
       if (!existingSubmission) {
         const firstMeasurementSet = Object.assign({}, submission.measurementSets.pop(), {submission: {
           programName: submission.programName,

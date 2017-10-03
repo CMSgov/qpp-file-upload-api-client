@@ -2,10 +2,11 @@ const rp = require('request-promise');
 
 /*
  * Function for validating a submission Object using the /submissions/validate
- * endpoint. Returns nothing if it was successful -- if there was an error,
- * we throw an error
+ * endpoint. Returns the validated submission if it was successful -- if there
+ * was an error, we throw an error
  *
  * @param {Object} submission
+ * @param {String} submissionFormat
  * @param {Object} baseOptions
  */
 const validateSubmission = function(submission, submissionFormat, baseOptions) {
@@ -108,7 +109,8 @@ const getExistingSubmission = function(submission, baseOptions) {
 
 /*
  * Function for calling PUT /measurement-sets on the Submissions API. Expects
- * a 200 status code.
+ * a 200 status code. request-promise will throw an error if the response has
+ * a non-2xx status code
  *
  * @param {Object} measurementSet
  * @param {Object} baseOptions
@@ -130,7 +132,8 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
 
 /*
  * Function for calling POST /measurement-sets on the Submissions API. Expects
- * a 201 status code.
+ * a 201 status code. request-promise will throw an error if the response has
+ * a non-2xx status code
  *
  * @param {Object} measurementSet
  * @param {Object} baseOptions
@@ -186,7 +189,7 @@ const submitMeasurementSets = function(existingSubmission, submission, baseOptio
       }});
     };
 
-    // Look for existing measurementSets with the same cateogry + submissionMethod
+    // Look for existing measurementSets with the same category + submissionMethod
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
       return existingMeasurementSet.submissionMethod === measurementSet.submissionMethod &&
         existingMeasurementSet.category === measurementSet.category;

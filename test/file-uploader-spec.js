@@ -1,6 +1,6 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
-// const sinon = require('sinon');
+
 const fileUploader = require('../file-uploader');
 const fileUploaderUtil = require('../file-uploader-util');
 

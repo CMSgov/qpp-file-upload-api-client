@@ -1,7 +1,7 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const rp = require('request-promise');
-// const sinon = require('sinon');
+
 const {
   validateSubmission,
   getExistingSubmission,
@@ -110,7 +110,6 @@ describe('fileUploaderUtils', () => {
           sinon.assert.calledOnce(rpPostStub);
           assert.strictEqual(rpPostStub.firstCall.args[0].headers['Content-Type'], 'application/xml');
           assert.strictEqual(rpPostStub.firstCall.args[0].headers['Accept'], 'application/json');
-          console.log('hey');
         });
     });
   });
@@ -222,7 +221,7 @@ describe('fileUploaderUtils', () => {
         });
     });
 
-    it('throws an error if the API returns anything other than a 200', () => {
+    it('throws an error if the API returns anything other than a 201', () => {
       const rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
       }));
