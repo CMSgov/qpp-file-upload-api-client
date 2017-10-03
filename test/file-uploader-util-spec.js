@@ -72,7 +72,7 @@ describe('fileUploaderUtils', () => {
         });
     });
 
-    it('throws an error if the API returns anything other than a 200', () => {
+    it('throws an error if the API returns anything other than a 201', () => {
       rpPostStub.restore();
       rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
         reject(new Error('Invalid Submission Object'));
