@@ -84,6 +84,23 @@ describe('fileUploaderUtils', () => {
         });
     });
 
+    it('throws an error if there are no measurementSets to create', () => {
+      const validSubmissionNoMsets = Object.assign({}, validSubmission, {measurementSets: []});
+      rpPostStub.restore();
+      rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
+        resolve(JSON.stringify({
+          data: {
+            submission: validSubmissionNoMsets
+          }
+        }));
+      }));
+
+      return validateSubmission(validSubmissionNoMsets, 'JSON', baseOptions)
+        .catch((err) => {
+          assert.throws(() => {throw err}, 'At least one measurementSet must be defined to use this functionality');
+        });
+    });
+
     it('will use the Submissions API to convert XML to JSON', () => {
       // Don't need to actually send an XML submission here, just making
       // sure that the "XML" submissionFormat will trigger the right
@@ -276,7 +293,7 @@ describe('fileUploaderUtils', () => {
         }]
       };
 
-      const promiseArray = submitMeasurementSets(existingSubmission, {}, validSubmissionMoreMSets.measurementSets, {});
+      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
           sinon.assert.calledOnce(rpPostStub)

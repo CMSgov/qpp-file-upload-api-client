@@ -51,30 +51,6 @@ describe('fileUploader', () => {
     });
   });
 
-
-  it('throws an error if there are no measurementSets to create', () => {
-    const validateSubmissionStub = sandbox.stub(fileUploaderUtil, 'validateSubmission').callsFake((submission, submissionFormat, baseOptions) => {
-      return new Promise((resolve, reject) => {
-        resolve(Object.assign({}, validSubmission, {measurementSets: []}));
-      });
-    });
-
-    const getExistingSubmissionStub = sandbox.stub(fileUploaderUtil, 'getExistingSubmission').callsFake((submission, baseOptions) => {
-      return new Promise((resolve, reject) => {
-        resolve({});
-      });
-    });
-
-    return fileUploader(JSON.stringify(validSubmission), 'JSON', 'testJWT', '', (err, mSets) => {
-        assert.exists(err);
-        assert.strictEqual(mSets.length, 0);
-        sinon.assert.calledOnce(validateSubmissionStub);
-        sinon.assert.notCalled(getExistingSubmissionStub);
-
-        assert.throws(() => {throw err}, 'At least one measurementSet must be defined to use this functionality');
-        });
-  });
-
   it('calls postMeasurementSet once first if there\'s no existing submission, before calling submitMeasurementSets', () => {
     const validateSubmissionStub = sandbox.stub(fileUploaderUtil, 'validateSubmission').callsFake((submission, submissionFormat, baseOptions) => {
       return new Promise((resolve, reject) => {

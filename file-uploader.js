@@ -17,7 +17,6 @@ const fileUploaderUtil = require('./file-uploader-util');
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let submission;
   let existingSubmission
-  let measurementSetsToCreate;
   const errs = [];
   const createdMeasurementSets = [];
 
@@ -32,12 +31,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
 
   return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
     .then((validSubmission) => {
-      submission = Object.assign({}, validSubmission, {measurementSets: []});
-      measurementSetsToCreate = validSubmission.measurementSets;
-
-      if (!measurementSetsToCreate || measurementSetsToCreate.length === 0) {
-        throw new Error('At least one measurementSet must be defined to use this functionality');
-      };
+      submission = validSubmission;
       return fileUploaderUtil.getExistingSubmission(submission, baseOptions);
     }).then((existingSubmissionReturned) => {
       existingSubmission = existingSubmissionReturned;
@@ -49,7 +43,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       // errors
       //
       if (!existingSubmission) {
-        const firstMeasurementSet = Object.assign({}, measurementSetsToCreate.pop(), {submission: {
+        const firstMeasurementSet = Object.assign({}, submission.measurementSets.pop(), {submission: {
           programName: submission.programName,
           entityType: submission.entityType,
           entityId: submission.entityId || null,
@@ -69,7 +63,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       };
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseOptions);
+      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, submission, baseOptions);
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others

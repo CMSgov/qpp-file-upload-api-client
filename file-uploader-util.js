@@ -35,7 +35,13 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
 
   return rp.post(validateSubmissionOptions)
     .then((body) => {
-      return JSON.parse(body).data.submission;
+      const validatedSubmission = JSON.parse(body).data.submission;
+
+      if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
+        throw new Error('At least one measurementSet must be defined to use this functionality');
+      };
+
+      return validatedSubmission;
     });
 };
 
@@ -156,9 +162,9 @@ const postMeasurementSet = function(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-const submitMeasurementSets = function(existingSubmission, submission, measurementSetsToCreate, baseOptions) {
+const submitMeasurementSets = function(existingSubmission, submission, baseOptions) {
   const promises = [];
-  measurementSetsToCreate.forEach((measurementSet) => {
+  submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
     let existingMeasurementSets = [];
     let err;
