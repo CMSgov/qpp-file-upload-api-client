@@ -63,30 +63,26 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
 
       return firstMeasurementSetPromise;
     }).then((firstMeasurementSetOutput) => {
-      // If we did fire off the first POST /measurement-sets call and it resulted in an
-      // error, throw it here before trying the others
+      // If we did fire off the first POST /measurement-sets call and it worked (because
+      // no error was thrown), then store the output here
       if (firstMeasurementSetOutput) {
-        if (firstMeasurementSetOutput[0]) {
-          throw new Error('Could not create first measurementSet: ' + JSON.stringify(firstMeasurementSetOutput[0]));
-        };
-
-        if (firstMeasurementSetOutput[1]) {
-          createdMeasurementSets.push(firstMeasurementSetOutput[1]);
-        };
+        createdMeasurementSets.push(firstMeasurementSetOutput);
       };
 
       // Submit all remaining measurementSets
       const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, submission, measurementSetsToCreate, baseOptions);
-      return Promise.all(postAndPutPromises);
+
+      // Transform rejected promises into Errors so they are caught and don't short-circuit
+      // the others
+      const caughtPromises = postAndPutPromises.map(promise => promise.catch(Error));
+      return Promise.all(caughtPromises);
     }).then((postAndPutOutputs) => {
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
-        if (postOrPutOutput[0]) {
-          errs.push(postOrPutOutput[0]);
-        };
-
-        if (postOrPutOutput[1]) {
-          createdMeasurementSets.push(postOrPutOutput[1]);
+        if (postOrPutOutput instanceof Error) {
+          errs.push(postOrPutOutput);
+        } else {
+          createdMeasurementSets.push(postOrPutOutput);
         };
       });
 

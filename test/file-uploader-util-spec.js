@@ -78,10 +78,7 @@ describe('fileUploaderUtils', () => {
     it('throws an error if the API returns anything other than a 200', () => {
       rpPostStub.restore();
       rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 422,
-          body: ''
-        });
+        reject(new Error('Invalid Submission Object'));
       }));
 
       return validateSubmission(validSubmission, 'JSON', baseOptions)
@@ -130,10 +127,7 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if the API returns anything other than a 200', () => {
       const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 422,
-          body: ''
-        });
+        reject(new Error('Could not fetch existing Submissions'));
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -181,14 +175,10 @@ describe('fileUploaderUtils', () => {
       }));
 
       return putMeasurementSet(validSubmission.measurementSets[0], baseOptions, '001')
-        .then((returnedArray) => {
+        .then((mSet) => {
           sinon.assert.calledOnce(rpPutStub);
           assert.strictEqual(rpPutStub.firstCall.args[0].url, '/measurement-sets/001');
 
-          const err = returnedArray[0];
-          const mSet = returnedArray[1];
-
-          assert.notExists(err);
           assert.exists(mSet);
           assert.deepEqual(validSubmission.measurementSets[0], mSet);
         });
@@ -196,15 +186,12 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if the API returns anything other than a 200', () => {
       const rpPutStub = sandbox.stub(rp, 'put').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 422,
-          body: ''
-        });
+        reject(new Error('Random API Error'));
       }));
 
       return putMeasurementSet(validSubmission, baseOptions, '001')
         .catch((err) => {
-          assert.throws(() => {throw err}, 'PUT /measurement-sets failed: ');
+          assert.throws(() => {throw err}, 'Random API Error');
         });
     });
 
@@ -224,14 +211,10 @@ describe('fileUploaderUtils', () => {
       }));
 
       return postMeasurementSet(validSubmission.measurementSets[0], baseOptions)
-        .then((returnedArray) => {
+        .then((mSet) => {
           sinon.assert.calledOnce(rpPostStub);
           assert.strictEqual(rpPostStub.firstCall.args[0].url, '/measurement-sets');
 
-          const err = returnedArray[0];
-          const mSet = returnedArray[1];
-
-          assert.notExists(err);
           assert.exists(mSet);
           assert.deepEqual(validSubmission.measurementSets[0], mSet);
         });
@@ -239,15 +222,12 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if the API returns anything other than a 200', () => {
       const rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 422,
-          body: ''
-        });
+        reject(new Error('Random API Error'));
       }));
 
       return postMeasurementSet(validSubmission, baseOptions, '001')
         .catch((err) => {
-          assert.throws(() => {throw err}, 'POST /measurement-sets failed: ');
+          assert.throws(() => {throw err}, 'Random API Error');
         });
     });
 
@@ -259,12 +239,12 @@ describe('fileUploaderUtils', () => {
     beforeEach(() => {
       rpPostStub = sandbox.stub(rp, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
-          resolve([null, mSet]);
+          resolve({body: JSON.stringify({data: {measurementSet: mSet}})});
         });
       });
       rpPutStub = sandbox.stub(rp, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
-          resolve([null, mSet]);
+          resolve({body: JSON.stringify({data: {measurementSet: mSet}})});
         });
       });
     });

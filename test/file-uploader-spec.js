@@ -93,14 +93,12 @@ describe('fileUploader', () => {
 
     const postMeasurementSetStub = sandbox.stub(fileUploaderUtil, 'postMeasurementSet').callsFake((measurementSet, options) => {
       return new Promise((resolve, reject) => {
-        resolve([null, validSubmission.measurementSets[0]]);
+        resolve(validSubmission.measurementSets[0]);
       }); 
     });
 
     const submitMeasurementSetsStub = sandbox.stub(fileUploaderUtil, 'submitMeasurementSets').callsFake((existingSubmission, submission, mSetsToCreate, options) => {
-      return [new Promise((resolve, reject) => {
-        resolve([]);
-      })];
+      return [];
     });
 
     return fileUploader(JSON.stringify(validSubmission), 'JSON', 'testJWT', '', (err, mSets) => {

@@ -114,7 +114,7 @@ const getExistingSubmission = function(submission, baseOptions) {
  * @param {Object} measurementSet
  * @param {Object} baseOptions
  * @param {String} measurementSetId
- * @return {Array<String, Object>}
+ * @return {Object}
  */
 const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId) {
   const putMeasurementSetOptions = Object.assign({}, baseOptions, {
@@ -124,13 +124,8 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
 
   return rp.put(putMeasurementSetOptions)
     .then((response) => {
-      if (response.statusCode !== 200) {
-        return ['PUT /measurement-sets failed: ' + response.body, null];
-      }
-      return [null, JSON.parse(response.body)['data']['measurementSet']];
-    })
-    .catch((err) => {
-      return [err, null];
+      // Assuming a 200 response here
+      return JSON.parse(response.body)['data']['measurementSet'];
     });
 };
 
@@ -140,7 +135,7 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
  *
  * @param {Object} measurementSet
  * @param {Object} baseOptions
- * @return {Array<String, Object>}
+ * @return {Object}
  */
 const postMeasurementSet = function(measurementSet, baseOptions) {
   const postMeasurementSetOptions = Object.assign({}, baseOptions, {
@@ -150,13 +145,8 @@ const postMeasurementSet = function(measurementSet, baseOptions) {
 
   return rp.post(postMeasurementSetOptions)
     .then((response) => {
-      if (response.statusCode !== 201) {
-        return ['PUT /measurement-sets failed: ' + response.body, null];
-      }
-      return [null, JSON.parse(response.body)['data']['measurementSet']];
-    })
-    .catch((err) => {
-      return [err, null];
+      // Assuming a 201 response here
+      return JSON.parse(response.body)['data']['measurementSet'];
     });
 };
 
