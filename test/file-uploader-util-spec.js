@@ -47,14 +47,11 @@ describe('fileUploaderUtils', () => {
     let rpPostStub;
     beforeEach(() => {
       rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({
-            data: {
-              submission: validSubmission
-            }
-          })
-        });
+        resolve(JSON.stringify({
+          data: {
+            submission: validSubmission
+          }
+        }));
       }));
     });
 
@@ -104,14 +101,11 @@ describe('fileUploaderUtils', () => {
   describe('getExistingSubmission', () => {
     it('makes a network call to GET /submissions and returns a matching submission if there is one', () => {
       const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({
-            data: {
-              submissions: [Object.assign({}, validSubmission, {id: '001'})]
-            }
-          })
-        });
+        resolve(JSON.stringify({
+          data: {
+            submissions: [Object.assign({}, validSubmission, {id: '001'})]
+          }
+        }));
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -138,20 +132,17 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if there are more than 1 matching submissions', () => {
       const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({
-            data: {
-              submissions: [{
-                entityId: '123456',
-                entityType: 'individual'
-              }, {
-                entityId: '234567',
-                entityType: 'individual'
-              }]
-            }
-          })
-        });
+        resolve(JSON.stringify({
+          data: {
+            submissions: [{
+              entityId: '123456',
+              entityType: 'individual'
+            }, {
+              entityId: '234567',
+              entityType: 'individual'
+            }]
+          }
+        }));
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -164,14 +155,11 @@ describe('fileUploaderUtils', () => {
   describe('putMeasurementSet', () => {
     it('makes a network call to PUT /measurement-sets and returns a measurementSet if it was valid', () => {
       const rpPutStub = sandbox.stub(rp, 'put').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({
-            data: {
-              measurementSet: validSubmission.measurementSets[0]
-            }
-          })
-        });
+        resolve(JSON.stringify({
+          data: {
+            measurementSet: validSubmission.measurementSets[0]
+          }
+        }));
       }));
 
       return putMeasurementSet(validSubmission.measurementSets[0], baseOptions, '001')
@@ -200,14 +188,11 @@ describe('fileUploaderUtils', () => {
   describe('postMeasurementSet', () => {
     it('makes a network call to POST /measurement-sets and returns a measurementSet if it was valid', () => {
       const rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve({
-          statusCode: 201,
-          body: JSON.stringify({
-            data: {
-              measurementSet: validSubmission.measurementSets[0]
-            }
-          })
-        });
+        resolve(JSON.stringify({
+          data: {
+            measurementSet: validSubmission.measurementSets[0]
+          }
+        }));
       }));
 
       return postMeasurementSet(validSubmission.measurementSets[0], baseOptions)
@@ -239,12 +224,12 @@ describe('fileUploaderUtils', () => {
     beforeEach(() => {
       rpPostStub = sandbox.stub(rp, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
-          resolve({body: JSON.stringify({data: {measurementSet: mSet}})});
+          resolve(JSON.stringify({data: {measurementSet: mSet}}));
         });
       });
       rpPutStub = sandbox.stub(rp, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
-          resolve({body: JSON.stringify({data: {measurementSet: mSet}})});
+          resolve(JSON.stringify({data: {measurementSet: mSet}}));
         });
       });
     });

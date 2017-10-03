@@ -34,11 +34,8 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
   });
 
   return rp.post(validateSubmissionOptions)
-    .then((response) => {
-      if (response.statusCode === 200) return JSON.parse(response.body)['data']['submission'];
-
-      // TODO(sam): Add error from response with paths and whatnot
-      throw new Error('Invalid Submission Object');
+    .then((body) => {
+      return JSON.parse(body).data.submission;
     });
 };
 
@@ -81,12 +78,8 @@ const getExistingSubmission = function(submission, baseOptions) {
   });
 
   return rp.get(getSubmissionsOptions)
-    .then((response) => {
-      if (response.statusCode !== 200) {
-        throw new Error('Could not fetch existing Submissions');
-      };
-
-      const jsonBody = JSON.parse(response.body);
+    .then((body) => {
+      const jsonBody = JSON.parse(body);
       const existingSubmissions = jsonBody.data.submissions;
 
       // Look for a submission with the same entityType -- need to do this here because
@@ -123,9 +116,9 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
   });
 
   return rp.put(putMeasurementSetOptions)
-    .then((response) => {
+    .then((body) => {
       // Assuming a 200 response here
-      return JSON.parse(response.body)['data']['measurementSet'];
+      return JSON.parse(body).data.measurementSet;
     });
 };
 
@@ -144,9 +137,9 @@ const postMeasurementSet = function(measurementSet, baseOptions) {
   });
 
   return rp.post(postMeasurementSetOptions)
-    .then((response) => {
+    .then((body) => {
       // Assuming a 201 response here
-      return JSON.parse(response.body)['data']['measurementSet'];
+      return JSON.parse(body).data.measurementSet;
     });
 };
 

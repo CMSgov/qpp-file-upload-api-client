@@ -27,8 +27,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       'Authorization': 'Bearer ' + JWT,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
-    },
-    resolveWithFullResponse: true
+    }
   };
 
   return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
