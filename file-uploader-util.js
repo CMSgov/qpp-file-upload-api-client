@@ -78,10 +78,9 @@ const getExistingSubmission = function(submission, baseOptions) {
 
   const getSubmissionsOptions = Object.assign({}, baseOptions, {
     url: baseOptions.url + '/submissions?' + queryParamString,
-    headers: {
-      ...baseOptions.headers,
+    headers: Object.assign({}, baseOptions.headers, {
       'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
-    }
+    })
   });
 
   return rp.get(getSubmissionsOptions)
