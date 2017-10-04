@@ -169,8 +169,6 @@ const submitMeasurementSets = function(existingSubmission, submission, baseOptio
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
     let existingMeasurementSets = [];
-    let err;
-    let newMeasurementSet;
 
     // If there's an existing submission, then the measurementSet to submit needs the
     // submissionId in it. If not, we put the submission object in the measurementSet

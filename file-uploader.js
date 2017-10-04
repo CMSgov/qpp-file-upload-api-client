@@ -15,7 +15,7 @@ const fileUploaderUtil = require('./file-uploader-util');
  * @return {Promise}
  */
 const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
-  let submission;
+  let validatedSubmission;
   let existingSubmission
   const errs = [];
   const createdMeasurementSets = [];
@@ -31,8 +31,8 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
 
   return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
     .then((validSubmission) => {
-      submission = validSubmission;
-      return fileUploaderUtil.getExistingSubmission(submission, baseOptions);
+      validatedSubmission = validSubmission;
+      return fileUploaderUtil.getExistingSubmission(validatedSubmission, baseOptions);
     }).then((existingSubmissionReturned) => {
       existingSubmission = existingSubmissionReturned;
       let firstMeasurementSetPromise;
@@ -42,13 +42,13 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       // with other POST /measurement-sets calls to create the submission, which can cause
       // errors
       if (!existingSubmission) {
-        const firstMeasurementSet = Object.assign({}, submission.measurementSets.pop(), {submission: {
-          programName: submission.programName,
-          entityType: submission.entityType,
-          entityId: submission.entityId || null,
-          taxpayerIdentificationNumber: submission.taxpayerIdentificationNumber,
-          nationalProviderIdentifier: submission.nationalProviderIdentifier || null,
-          performanceYear: submission.performanceYear
+        const firstMeasurementSet = Object.assign({}, validatedSubmission.measurementSets.pop(), {submission: {
+          programName: validatedSubmission.programName,
+          entityType: validatedSubmission.entityType,
+          entityId: validatedSubmission.entityId || null,
+          taxpayerIdentificationNumber: validatedSubmission.taxpayerIdentificationNumber,
+          nationalProviderIdentifier: validatedSubmission.nationalProviderIdentifier || null,
+          performanceYear: validatedSubmission.performanceYear
         }});
         firstMeasurementSetPromise = fileUploaderUtil.postMeasurementSet(firstMeasurementSet, baseOptions);
       };
@@ -62,7 +62,7 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
       };
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, submission, baseOptions);
+      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions);
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others
