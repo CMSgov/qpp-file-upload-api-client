@@ -17,7 +17,7 @@ Arguments
 1. `submissionFormat`: A string specifying the format -- only "JSON" and "XML" are supported
 1. `JWT`: A string with the user's JSON Web Token (JWT)
 1. `baseSubmissionURL`: A string with the base URL to be used to specify the Submissions API -- for the production instance of the Submissions API, for example, you'd use `https://qpp.cms.gov/api/submissions`
-1. `callback`: A callback function to be called when the `fileUploader()` function is finished. Should accept a string as the first argument, for an aggregated string of errors (if there are any), and an array of created measurementSets (Objects) as the second argument
+1. `callback`: A callback function to be called when the `fileUploader()` function is finished. Should accept an array of Error objects as the first argument, for the list of Errors that were thrown during the function call, and an array of created measurementSets (Objects) as the second argument
 
 ## Testing
 To run the automated tests for this module, simply run:

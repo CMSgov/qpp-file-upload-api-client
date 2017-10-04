@@ -42,13 +42,13 @@ describe('fileUploader', () => {
         resolve({});
       });
     });
-    return fileUploader(JSON.stringify(validSubmission), 'FAKE', 'testJWT', '', (err, mSets) => {
-        assert.exists(err);
+    return fileUploader(JSON.stringify(validSubmission), 'FAKE', 'testJWT', '', (errs, mSets) => {
+        assert.strictEqual(errs.length, 1);
         assert.strictEqual(mSets.length, 0);
         sinon.assert.calledOnce(validateSubmissionStub);
         sinon.assert.notCalled(getExistingSubmissionStub);
 
-        assert.throws(() => {throw err}, 'Invalid format');
+        assert.throws(() => {throw errs[0]}, 'Invalid format');
     });
   });
 
@@ -78,8 +78,8 @@ describe('fileUploader', () => {
       return [];
     });
 
-    return fileUploader(JSON.stringify(validSubmission), 'JSON', 'testJWT', '', (err, mSets) => {
-        assert.strictEqual(err, '');
+    return fileUploader(JSON.stringify(validSubmission), 'JSON', 'testJWT', '', (errs, mSets) => {
+        assert.strictEqual(errs.length, 0);
         assert.strictEqual(mSets.length, 1);
         assert.deepEqual(mSets[0], validSubmission.measurementSets[0]);
 
@@ -162,11 +162,12 @@ describe('fileUploader', () => {
       });
     });
 
-    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', 'testJWT', '', (err, mSets) => {
+    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', 'testJWT', '', (errs, mSets) => {
       sinon.assert.calledOnce(rpPostStub);
       sinon.assert.calledOnce(rpPutStub);
 
-      assert.include(err, 'Random Submissions API error');
+      assert.strictEqual(errs.length, 1);
+      assert.throws(() => {throw errs[0]}, 'Random Submissions API error');
       assert.strictEqual(mSets.length, 1);
       assert.deepEqual(mSets[0], measurementSetToCreate);
     });

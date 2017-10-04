@@ -78,16 +78,11 @@ const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmiss
         };
       });
 
-      let errString;
-      if (errs) {
-        errString = errs.join('; ');
-      }
-
       // Call the callback with the aggregated error string and list of measurementSets created
-      callback(errString, createdMeasurementSets);
+      callback(errs, createdMeasurementSets);
     }).catch((err) => {
       // Call the callback with the aggregated error string and an empty list (no measurementSets created)
-      callback(err, []);
+      callback([err], []);
     });
 };
 
