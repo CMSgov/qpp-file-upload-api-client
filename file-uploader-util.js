@@ -1,4 +1,4 @@
-const rp = require('request-promise');
+import { axios } from 'axios';
 
 /*
  * Function for validating a submission Object using the /submissions/validate
@@ -9,7 +9,7 @@ const rp = require('request-promise');
  * @param {String} submissionFormat
  * @param {Object} baseOptions
  */
-const validateSubmission = function(submission, submissionFormat, baseOptions) {
+function validateSubmission(submission, submissionFormat, baseOptions) {
   const headers = Object.assign({}, baseOptions.headers);
 
   // We're going to receive JSON from the Submissions API with the submission object
@@ -29,12 +29,11 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
   };
 
   const validateSubmissionOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/submissions/validate',
     headers: headers,
-    body: submission
+    data: submission
   });
 
-  return rp.post(validateSubmissionOptions)
+  return axios.post(baseOptions.url + '/submissions/validate', validateSubmissionOptions)
     .then((body) => {
       const validatedSubmission = JSON.parse(body).data.submission;
 
@@ -60,7 +59,7 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
  * @param {Object} baseOptions
  * @return {Object}
  */
-const getExistingSubmission = function(submission, baseOptions) {
+function getExistingSubmission(submission, baseOptions) {
   const queryParams = {};
 
   if (submission.nationalProviderIdentifier) {
@@ -77,13 +76,12 @@ const getExistingSubmission = function(submission, baseOptions) {
   }).join('&');
 
   const getSubmissionsOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/submissions?' + queryParamString,
     headers: Object.assign({}, baseOptions.headers, {
       'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
     })
   });
 
-  return rp.get(getSubmissionsOptions)
+  return axios.get(baseOptions.url + '/submissions?' + queryParamString, getSubmissionsOptions)
     .then((body) => {
       const jsonBody = JSON.parse(body);
       const existingSubmissions = jsonBody.data.submissions;
@@ -116,13 +114,12 @@ const getExistingSubmission = function(submission, baseOptions) {
  * @param {String} measurementSetId
  * @return {Object}
  */
-const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId) {
+function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
   const putMeasurementSetOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/measurement-sets/' + measurementSetId,
-    body: JSON.stringify(measurementSet)
+    data: JSON.stringify(measurementSet)
   });
 
-  return rp.put(putMeasurementSetOptions)
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, putMeasurementSetOptions)
     .then((body) => {
       // Assuming a 200 response here
       return JSON.parse(body).data.measurementSet;
@@ -138,13 +135,12 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
  * @param {Object} baseOptions
  * @return {Object}
  */
-const postMeasurementSet = function(measurementSet, baseOptions) {
+function postMeasurementSet(measurementSet, baseOptions) {
   const postMeasurementSetOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/measurement-sets',
-    body: JSON.stringify(measurementSet)
+    data: JSON.stringify(measurementSet)
   });
 
-  return rp.post(postMeasurementSetOptions)
+  return axios.post(baseOptions.url + '/measurement-sets', postMeasurementSetOptions)
     .then((body) => {
       // Assuming a 201 response here
       return JSON.parse(body).data.measurementSet;
@@ -164,7 +160,7 @@ const postMeasurementSet = function(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-const submitMeasurementSets = function(existingSubmission, submission, baseOptions) {
+function submitMeasurementSets(existingSubmission, submission, baseOptions) {
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;

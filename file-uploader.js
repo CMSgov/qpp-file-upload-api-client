@@ -1,4 +1,4 @@
-const fileUploaderUtil = require('./file-uploader-util');
+import { fileUploaderUtil } from './file-uploader-util';
 
 /*
  * Main function to be exported from this file. Calls individual functions to
@@ -14,7 +14,7 @@ const fileUploaderUtil = require('./file-uploader-util');
  *
  * @return {Promise}
  */
-const fileUploader = function(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
+export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let validatedSubmission;
   let existingSubmission
   const errs = [];
