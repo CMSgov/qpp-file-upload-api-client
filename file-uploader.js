@@ -85,5 +85,3 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
       callback([err], []);
     });
 };
-
-module.exports = fileUploader;

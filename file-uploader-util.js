@@ -1,4 +1,4 @@
-import { axios } from 'axios';
+import axios from 'axios';
 
 /*
  * Function for validating a submission Object using the /submissions/validate
@@ -9,7 +9,7 @@ import { axios } from 'axios';
  * @param {String} submissionFormat
  * @param {Object} baseOptions
  */
-function validateSubmission(submission, submissionFormat, baseOptions) {
+export function validateSubmission(submission, submissionFormat, baseOptions) {
   const headers = Object.assign({}, baseOptions.headers);
 
   // We're going to receive JSON from the Submissions API with the submission object
@@ -59,7 +59,7 @@ function validateSubmission(submission, submissionFormat, baseOptions) {
  * @param {Object} baseOptions
  * @return {Object}
  */
-function getExistingSubmission(submission, baseOptions) {
+export function getExistingSubmission(submission, baseOptions) {
   const queryParams = {};
 
   if (submission.nationalProviderIdentifier) {
@@ -114,7 +114,7 @@ function getExistingSubmission(submission, baseOptions) {
  * @param {String} measurementSetId
  * @return {Object}
  */
-function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
+export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
   const putMeasurementSetOptions = Object.assign({}, baseOptions, {
     data: JSON.stringify(measurementSet)
   });
@@ -135,13 +135,13 @@ function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
  * @param {Object} baseOptions
  * @return {Object}
  */
-function postMeasurementSet(measurementSet, baseOptions) {
+export function postMeasurementSet(measurementSet, baseOptions) {
   const postMeasurementSetOptions = Object.assign({}, baseOptions, {
     data: JSON.stringify(measurementSet)
   });
-
+  
   return axios.post(baseOptions.url + '/measurement-sets', postMeasurementSetOptions)
-    .then((body) => {
+  .then((body) => {
       // Assuming a 201 response here
       return JSON.parse(body).data.measurementSet;
     });
@@ -160,7 +160,7 @@ function postMeasurementSet(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-function submitMeasurementSets(existingSubmission, submission, baseOptions) {
+export function submitMeasurementSets(existingSubmission, submission, baseOptions) {
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
@@ -200,7 +200,7 @@ function submitMeasurementSets(existingSubmission, submission, baseOptions) {
   return promises;
 };
 
-module.exports = {
+export const fileUploaderUtil = {
   validateSubmission,
   getExistingSubmission,
   putMeasurementSet,

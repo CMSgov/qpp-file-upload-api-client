@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "mocha --recursive test",
-    "build": "npm run clean && webpack --progress --colors --env.production=false",
+    "test": "mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
+    "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist"
   },
   "repository": {
@@ -26,6 +27,7 @@
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "mocha": "^3.5.3",
     "rimraf": "^2.6.2",

@@ -1,6 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const package = require('./package.json');
+
 const entry = ['./index.js'];
 
 const _module = {
@@ -10,6 +12,16 @@ const _module = {
         exclude: /node_modules/
     }]
 };
+
+const plugins = [
+    new webpack.DefinePlugin({
+        'process.env': {
+            NODE_ENV: JSON.stringify('production')
+        },
+        buildVersion: JSON.stringify(package.version)
+    }),
+    new webpack.optimize.UglifyJsPlugin(),
+];
 
 const resolve = {
     extensions: ['.js', '.json', '*']
@@ -22,13 +34,13 @@ const defaultConfig = (env, argv) => {
         entry,
         output: {
             library: 'QppFileUploadClient',
-            // libraryTarget: 'umd',
+            libraryTarget: 'commonjs2',
             filename: 'node.js',
             path: path.resolve(__dirname, 'dist')
         },
-        // devtool: env.production == 'true' ? 'source-map' : 'eval-source-map',
+        devtool: env && env.production == 'true' ? 'source-map' : 'eval-source-map',
         module: _module, // module is already defined
-        // plugins,
+        plugins,
         resolve
     });
 }
@@ -45,9 +57,9 @@ const browserConfig = (env, argv) => {
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist')
         },
-        // devtool: env.production == 'true' ? 'source-map' : 'eval-source-map',
+        devtool: env && env.production == 'true' ? 'source-map' : 'eval-source-map',
         module: _module, // module is already defined
-        // plugins,
+        plugins,
         resolve
     });
 }

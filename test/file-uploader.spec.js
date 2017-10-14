@@ -1,9 +1,9 @@
-const assert = require('chai').assert;
-const sinon = require('sinon');
-const rp = require('request-promise');
+import { assert } from 'chai';
+import sinon from 'sinon';
+import axios from 'axios';
 
-const fileUploader = require('../file-uploader');
-const fileUploaderUtil = require('../file-uploader-util');
+import { fileUploader } from '../file-uploader';
+import { fileUploaderUtil } from '../file-uploader-util';
 
 const validSubmission = {
   programName: 'mips',
@@ -144,27 +144,28 @@ describe('fileUploader', () => {
       });
     });
 
-    const rpPostStub = sandbox.stub(rp, 'post').callsFake((options) => {
+    const axiosPostStub = sandbox.stub(axios, 'post').callsFake((url, options) => {
       return new Promise((resolve, reject) => {
-        const measurementSetBody = JSON.parse(options.body);
+        const measurementSetBody = JSON.parse(options.data);
         const responseBody = {
           data: {
             measurementSet: measurementSetBody
           }
         };
+        // reject(new Error());
         resolve(JSON.stringify(responseBody));
       });
     });
 
-    const rpPutStub = sandbox.stub(rp, 'put').callsFake((options) => {
+    const axiosPutStub = sandbox.stub(axios, 'put').callsFake((url, options) => {
       return new Promise((resolve, reject) => {
         reject(new Error('Random Submissions API error'));
       });
     });
 
     return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', 'testJWT', '', (errs, mSets) => {
-      sinon.assert.calledOnce(rpPostStub);
-      sinon.assert.calledOnce(rpPutStub);
+      sinon.assert.calledOnce(axiosPostStub);
+      sinon.assert.calledOnce(axiosPutStub);
 
       assert.strictEqual(errs.length, 1);
       assert.throws(() => {throw errs[0]}, 'Random Submissions API error');
