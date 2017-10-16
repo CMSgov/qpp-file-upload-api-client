@@ -28,21 +28,17 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
     });
   };
 
-  const validateSubmissionOptions = Object.assign({}, baseOptions, {
-    headers: headers,
-    data: submission
+  return axios.post(baseOptions.url + '/submissions/validate', submission, {
+    headers: headers
+  }).then((body) => {
+    const validatedSubmission = JSON.parse(body).data.submission;
+
+    if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
+      throw new Error('At least one measurementSet must be defined to use this functionality');
+    };
+
+    return validatedSubmission;
   });
-
-  return axios.post(baseOptions.url + '/submissions/validate', validateSubmissionOptions)
-    .then((body) => {
-      const validatedSubmission = JSON.parse(body).data.submission;
-
-      if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
-        throw new Error('At least one measurementSet must be defined to use this functionality');
-      };
-
-      return validatedSubmission;
-    });
 };
 
 /*
@@ -115,11 +111,7 @@ export function getExistingSubmission(submission, baseOptions) {
  * @return {Object}
  */
 export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
-  const putMeasurementSetOptions = Object.assign({}, baseOptions, {
-    data: JSON.stringify(measurementSet)
-  });
-
-  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, putMeasurementSetOptions)
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, JSON.stringify(measurementSet))
     .then((body) => {
       // Assuming a 200 response here
       return JSON.parse(body).data.measurementSet;
@@ -136,11 +128,7 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
  * @return {Object}
  */
 export function postMeasurementSet(measurementSet, baseOptions) {
-  const postMeasurementSetOptions = Object.assign({}, baseOptions, {
-    data: JSON.stringify(measurementSet)
-  });
-  
-  return axios.post(baseOptions.url + '/measurement-sets', postMeasurementSetOptions)
+  return axios.post(baseOptions.url + '/measurement-sets', JSON.stringify(measurementSet))
   .then((body) => {
       // Assuming a 201 response here
       return JSON.parse(body).data.measurementSet;

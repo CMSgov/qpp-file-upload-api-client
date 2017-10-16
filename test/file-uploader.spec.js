@@ -144,9 +144,9 @@ describe('fileUploader', () => {
       });
     });
 
-    const axiosPostStub = sandbox.stub(axios, 'post').callsFake((url, options) => {
+    const axiosPostStub = sandbox.stub(axios, 'post').callsFake((url, data) => {
       return new Promise((resolve, reject) => {
-        const measurementSetBody = JSON.parse(options.data);
+        const measurementSetBody = JSON.parse(data);
         const responseBody = {
           data: {
             measurementSet: measurementSetBody
@@ -157,7 +157,7 @@ describe('fileUploader', () => {
       });
     });
 
-    const axiosPutStub = sandbox.stub(axios, 'put').callsFake((url, options) => {
+    const axiosPutStub = sandbox.stub(axios, 'put').callsFake((url, data) => {
       return new Promise((resolve, reject) => {
         reject(new Error('Random Submissions API error'));
       });

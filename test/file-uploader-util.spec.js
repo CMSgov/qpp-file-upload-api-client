@@ -108,8 +108,8 @@ describe('fileUploaderUtils', () => {
       return validateSubmission(validSubmission, 'XML', baseOptions)
         .then((returnedSubmission) => {
           sinon.assert.calledOnce(axiosPostStub);
-          assert.strictEqual(axiosPostStub.firstCall.args[1].headers['Content-Type'], 'application/xml');
-          assert.strictEqual(axiosPostStub.firstCall.args[1].headers['Accept'], 'application/json');
+          assert.strictEqual(axiosPostStub.firstCall.args[2].headers['Content-Type'], 'application/xml');
+          assert.strictEqual(axiosPostStub.firstCall.args[2].headers['Accept'], 'application/json');
         });
     });
   });

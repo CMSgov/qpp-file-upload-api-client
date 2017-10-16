@@ -52,7 +52,7 @@ const browserConfig = (env, argv) => {
         target: 'web',
         entry,
         output: {
-            // libraryTarget: 'var',
+            libraryTarget: 'commonjs2',
             library: 'QppFileUploadClient',
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist')
