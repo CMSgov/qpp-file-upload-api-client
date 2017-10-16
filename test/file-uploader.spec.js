@@ -149,11 +149,12 @@ describe('fileUploader', () => {
         const measurementSetBody = JSON.parse(data);
         const responseBody = {
           data: {
-            measurementSet: measurementSetBody
+            data: {
+              measurementSet: measurementSetBody
+            }
           }
         };
-        // reject(new Error());
-        resolve(JSON.stringify(responseBody));
+        resolve(responseBody);
       });
     });
 

@@ -47,11 +47,13 @@ describe('fileUploaderUtils', () => {
     let axiosPostStub;
     beforeEach(() => {
       axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            submission: validSubmission
+            data: {
+              submission: validSubmission
+            }
           }
-        }));
+        });
       }));
     });
 
@@ -88,11 +90,13 @@ describe('fileUploaderUtils', () => {
       const validSubmissionNoMsets = Object.assign({}, validSubmission, {measurementSets: []});
       axiosPostStub.restore();
       axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            submission: validSubmissionNoMsets
+            data: {
+              submission: validSubmissionNoMsets
+            }
           }
-        }));
+        });
       }));
 
       return validateSubmission(validSubmissionNoMsets, 'JSON', baseOptions)
@@ -117,11 +121,13 @@ describe('fileUploaderUtils', () => {
   describe('getExistingSubmission', () => {
     it('makes a network call to GET /submissions and returns a matching submission if there is one', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            submissions: [Object.assign({}, validSubmission, {id: '001'})]
-          }
-        }));
+            data: {
+              submissions: [Object.assign({}, validSubmission, {id: '001'})]
+            }
+          } 
+        });
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -148,17 +154,19 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if there are more than 1 matching submissions', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            submissions: [{
-              entityId: '123456',
-              entityType: 'individual'
-            }, {
-              entityId: '234567',
-              entityType: 'individual'
-            }]
+            data: {
+              submissions: [{
+                entityId: '123456',
+                entityType: 'individual'
+              }, {
+                entityId: '234567',
+                entityType: 'individual'
+              }]
+            }
           }
-        }));
+        });
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -171,11 +179,13 @@ describe('fileUploaderUtils', () => {
   describe('putMeasurementSet', () => {
     it('makes a network call to PUT /measurement-sets and returns a measurementSet if it was valid', () => {
       const axiosPutStub = sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            measurementSet: validSubmission.measurementSets[0]
+            data: {
+              measurementSet: validSubmission.measurementSets[0]
+            }
           }
-        }));
+        });
       }));
 
       return putMeasurementSet(validSubmission.measurementSets[0], baseOptions, '001')
@@ -204,11 +214,13 @@ describe('fileUploaderUtils', () => {
   describe('postMeasurementSet', () => {
     it('makes a network call to POST /measurement-sets and returns a measurementSet if it was valid', () => {
       const axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+        resolve({
           data: {
-            measurementSet: validSubmission.measurementSets[0]
+            data: {
+              measurementSet: validSubmission.measurementSets[0]
+            }
           }
-        }));
+        });
       }));
 
       return postMeasurementSet(validSubmission.measurementSets[0], baseOptions)
@@ -240,12 +252,20 @@ describe('fileUploaderUtils', () => {
     beforeEach(() => {
       axiosPostStub = sandbox.stub(axios, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
-          resolve(JSON.stringify({data: {measurementSet: mSet}}));
+          resolve({
+            data: {
+              data: {measurementSet: mSet}
+            }
+          });
         });
       });
       axiosPutStub = sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
-          resolve(JSON.stringify({data: {measurementSet: mSet}}));
+          resolve({
+            data: {
+              data: {measurementSet: mSet}
+            }
+          });
         });
       });
     });

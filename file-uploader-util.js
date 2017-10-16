@@ -31,7 +31,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
   return axios.post(baseOptions.url + '/submissions/validate', submission, {
     headers: headers
   }).then((body) => {
-    const validatedSubmission = JSON.parse(body).data.submission;
+    const validatedSubmission = body.data.data.submission;
 
     if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
       throw new Error('At least one measurementSet must be defined to use this functionality');
@@ -71,15 +71,14 @@ export function getExistingSubmission(submission, baseOptions) {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
   }).join('&');
 
-  const getSubmissionsOptions = Object.assign({}, baseOptions, {
-    headers: Object.assign({}, baseOptions.headers, {
-      'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
-    })
+  const headers = Object.assign({}, baseOptions.headers, {
+    'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
   });
 
-  return axios.get(baseOptions.url + '/submissions?' + queryParamString, getSubmissionsOptions)
-    .then((body) => {
-      const jsonBody = JSON.parse(body);
+  return axios.get(baseOptions.url + '/submissions?' + queryParamString, {
+    headers: headers
+  }).then((body) => {
+      const jsonBody = body.data
       const existingSubmissions = jsonBody.data.submissions;
 
       // Look for a submission with the same entityType -- need to do this here because
@@ -111,11 +110,12 @@ export function getExistingSubmission(submission, baseOptions) {
  * @return {Object}
  */
 export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
-  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, JSON.stringify(measurementSet))
-    .then((body) => {
-      // Assuming a 200 response here
-      return JSON.parse(body).data.measurementSet;
-    });
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, JSON.stringify(measurementSet), {
+    headers:baseOptions.headers
+  }).then((body) => {
+    // Assuming a 200 response here
+    return body.data.data.measurementSet;
+  });
 };
 
 /*
@@ -128,11 +128,12 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
  * @return {Object}
  */
 export function postMeasurementSet(measurementSet, baseOptions) {
-  return axios.post(baseOptions.url + '/measurement-sets', JSON.stringify(measurementSet))
-  .then((body) => {
-      // Assuming a 201 response here
-      return JSON.parse(body).data.measurementSet;
-    });
+  return axios.post(baseOptions.url + '/measurement-sets', JSON.stringify(measurementSet), {
+    headers: baseOptions.headers
+  }).then((body) => {
+    // Assuming a 201 response here
+    return body.data.data.measurementSet;
+  });
 };
 
 /*
