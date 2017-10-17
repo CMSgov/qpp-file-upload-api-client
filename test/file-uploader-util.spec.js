@@ -1,14 +1,14 @@
-const assert = require('chai').assert;
-const sinon = require('sinon');
-const rp = require('request-promise');
+import { assert } from 'chai';
+import sinon from 'sinon';
+import axios from 'axios';
 
-const {
+import {
   validateSubmission,
   getExistingSubmission,
   postMeasurementSet,
   putMeasurementSet,
   submitMeasurementSets
-} = require('../file-uploader-util');
+} from '../file-uploader-util';
 
 const baseOptions = {
   url: '',
@@ -44,22 +44,24 @@ describe('fileUploaderUtils', () => {
   });
 
   describe('validateSubmission', () => {
-    let rpPostStub;
+    let axiosPostStub;
     beforeEach(() => {
-      rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            submission: validSubmission
+            data: {
+              submission: validSubmission
+            }
           }
-        }));
+        });
       }));
     });
 
     it('makes a network call to POST /submissions/validate and returns the submission if successful', () => {
       return validateSubmission(validSubmission, 'JSON', baseOptions)
         .then((returnedSubmission) => {
-          sinon.assert.calledOnce(rpPostStub);
-          assert.strictEqual(rpPostStub.firstCall.args[0].url, '/submissions/validate');
+          sinon.assert.calledOnce(axiosPostStub);
+          assert.strictEqual(axiosPostStub.firstCall.args[0], '/submissions/validate');
 
           assert.deepEqual(validSubmission, returnedSubmission);
         });
@@ -73,8 +75,8 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 201', () => {
-      rpPostStub.restore();
-      rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
+      axiosPostStub.restore();
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
         reject(new Error('Invalid Submission Object'));
       }));
 
@@ -86,13 +88,15 @@ describe('fileUploaderUtils', () => {
 
     it('throws an error if there are no measurementSets to create', () => {
       const validSubmissionNoMsets = Object.assign({}, validSubmission, {measurementSets: []});
-      rpPostStub.restore();
-      rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      axiosPostStub.restore();
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            submission: validSubmissionNoMsets
+            data: {
+              submission: validSubmissionNoMsets
+            }
           }
-        }));
+        });
       }));
 
       return validateSubmission(validSubmissionNoMsets, 'JSON', baseOptions)
@@ -107,27 +111,29 @@ describe('fileUploaderUtils', () => {
       // header to be added
       return validateSubmission(validSubmission, 'XML', baseOptions)
         .then((returnedSubmission) => {
-          sinon.assert.calledOnce(rpPostStub);
-          assert.strictEqual(rpPostStub.firstCall.args[0].headers['Content-Type'], 'application/xml');
-          assert.strictEqual(rpPostStub.firstCall.args[0].headers['Accept'], 'application/json');
+          sinon.assert.calledOnce(axiosPostStub);
+          assert.strictEqual(axiosPostStub.firstCall.args[2].headers['Content-Type'], 'application/xml');
+          assert.strictEqual(axiosPostStub.firstCall.args[2].headers['Accept'], 'application/json');
         });
     });
   });
 
   describe('getExistingSubmission', () => {
     it('makes a network call to GET /submissions and returns a matching submission if there is one', () => {
-      const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            submissions: [Object.assign({}, validSubmission, {id: '001'})]
-          }
-        }));
+            data: {
+              submissions: [Object.assign({}, validSubmission, {id: '001'})]
+            }
+          } 
+        });
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
         .then((returnedSubmission) => {
-          sinon.assert.calledOnce(rpGetStub);
-          assert.strictEqual(rpGetStub.firstCall.args[0].url, '/submissions?nationalProviderIdentifier=' + validSubmission.nationalProviderIdentifier);
+          sinon.assert.calledOnce(axiosGetStub);
+          assert.strictEqual(axiosGetStub.firstCall.args[0], '/submissions?nationalProviderIdentifier=' + validSubmission.nationalProviderIdentifier);
 
           assert.exists(returnedSubmission);
           assert.strictEqual(returnedSubmission.id, '001');
@@ -136,7 +142,7 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 200', () => {
-      const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
+      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
         reject(new Error('Could not fetch existing Submissions'));
       }));
 
@@ -147,18 +153,20 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if there are more than 1 matching submissions', () => {
-      const rpGetStub = sandbox.stub(rp, 'get').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            submissions: [{
-              entityId: '123456',
-              entityType: 'individual'
-            }, {
-              entityId: '234567',
-              entityType: 'individual'
-            }]
+            data: {
+              submissions: [{
+                entityId: '123456',
+                entityType: 'individual'
+              }, {
+                entityId: '234567',
+                entityType: 'individual'
+              }]
+            }
           }
-        }));
+        });
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
@@ -170,18 +178,20 @@ describe('fileUploaderUtils', () => {
 
   describe('putMeasurementSet', () => {
     it('makes a network call to PUT /measurement-sets and returns a measurementSet if it was valid', () => {
-      const rpPutStub = sandbox.stub(rp, 'put').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      const axiosPutStub = sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            measurementSet: validSubmission.measurementSets[0]
+            data: {
+              measurementSet: validSubmission.measurementSets[0]
+            }
           }
-        }));
+        });
       }));
 
       return putMeasurementSet(validSubmission.measurementSets[0], baseOptions, '001')
         .then((mSet) => {
-          sinon.assert.calledOnce(rpPutStub);
-          assert.strictEqual(rpPutStub.firstCall.args[0].url, '/measurement-sets/001');
+          sinon.assert.calledOnce(axiosPutStub);
+          assert.strictEqual(axiosPutStub.firstCall.args[0], '/measurement-sets/001');
 
           assert.exists(mSet);
           assert.deepEqual(validSubmission.measurementSets[0], mSet);
@@ -189,7 +199,7 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 200', () => {
-      const rpPutStub = sandbox.stub(rp, 'put').returns(new Promise((resolve, reject) => {
+      const axiosPutStub = sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
       }));
 
@@ -203,18 +213,20 @@ describe('fileUploaderUtils', () => {
 
   describe('postMeasurementSet', () => {
     it('makes a network call to POST /measurement-sets and returns a measurementSet if it was valid', () => {
-      const rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
-        resolve(JSON.stringify({
+      const axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
           data: {
-            measurementSet: validSubmission.measurementSets[0]
+            data: {
+              measurementSet: validSubmission.measurementSets[0]
+            }
           }
-        }));
+        });
       }));
 
       return postMeasurementSet(validSubmission.measurementSets[0], baseOptions)
         .then((mSet) => {
-          sinon.assert.calledOnce(rpPostStub);
-          assert.strictEqual(rpPostStub.firstCall.args[0].url, '/measurement-sets');
+          sinon.assert.calledOnce(axiosPostStub);
+          assert.strictEqual(axiosPostStub.firstCall.args[0], '/measurement-sets');
 
           assert.exists(mSet);
           assert.deepEqual(validSubmission.measurementSets[0], mSet);
@@ -222,7 +234,7 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 201', () => {
-      const rpPostStub = sandbox.stub(rp, 'post').returns(new Promise((resolve, reject) => {
+      const axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
       }));
 
@@ -235,17 +247,25 @@ describe('fileUploaderUtils', () => {
   });
 
   describe('submitMeasurementSets', () => {
-    let rpPostStub;
-    let rpPutStub;
+    let axiosPostStub;
+    let axiosPutStub;
     beforeEach(() => {
-      rpPostStub = sandbox.stub(rp, 'post').callsFake((mSet, options) => {
+      axiosPostStub = sandbox.stub(axios, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
-          resolve(JSON.stringify({data: {measurementSet: mSet}}));
+          resolve({
+            data: {
+              data: {measurementSet: mSet}
+            }
+          });
         });
       });
-      rpPutStub = sandbox.stub(rp, 'put').callsFake((mSet, options, mSetId) => {
+      axiosPutStub = sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
-          resolve(JSON.stringify({data: {measurementSet: mSet}}));
+          resolve({
+            data: {
+              data: {measurementSet: mSet}
+            }
+          });
         });
       });
     });
@@ -295,8 +315,8 @@ describe('fileUploaderUtils', () => {
       const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.calledOnce(rpPostStub)
-          sinon.assert.calledOnce(rpPutStub)
+          sinon.assert.calledOnce(axiosPostStub)
+          sinon.assert.calledOnce(axiosPutStub)
         });
     });
   });

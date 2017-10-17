@@ -1,4 +1,4 @@
-const rp = require('request-promise');
+import axios from 'axios';
 
 /*
  * Function for validating a submission Object using the /submissions/validate
@@ -9,7 +9,7 @@ const rp = require('request-promise');
  * @param {String} submissionFormat
  * @param {Object} baseOptions
  */
-const validateSubmission = function(submission, submissionFormat, baseOptions) {
+export function validateSubmission(submission, submissionFormat, baseOptions) {
   const headers = Object.assign({}, baseOptions.headers);
 
   // We're going to receive JSON from the Submissions API with the submission object
@@ -28,22 +28,17 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
     });
   };
 
-  const validateSubmissionOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/submissions/validate',
-    headers: headers,
-    body: submission
+  return axios.post(baseOptions.url + '/submissions/validate', submission, {
+    headers: headers
+  }).then((body) => {
+    const validatedSubmission = body.data.data.submission;
+
+    if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
+      throw new Error('At least one measurementSet must be defined to use this functionality');
+    };
+
+    return validatedSubmission;
   });
-
-  return rp.post(validateSubmissionOptions)
-    .then((body) => {
-      const validatedSubmission = JSON.parse(body).data.submission;
-
-      if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
-        throw new Error('At least one measurementSet must be defined to use this functionality');
-      };
-
-      return validatedSubmission;
-    });
 };
 
 /*
@@ -60,7 +55,7 @@ const validateSubmission = function(submission, submissionFormat, baseOptions) {
  * @param {Object} baseOptions
  * @return {Object}
  */
-const getExistingSubmission = function(submission, baseOptions) {
+export function getExistingSubmission(submission, baseOptions) {
   const queryParams = {};
 
   if (submission.nationalProviderIdentifier) {
@@ -76,16 +71,14 @@ const getExistingSubmission = function(submission, baseOptions) {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
   }).join('&');
 
-  const getSubmissionsOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/submissions?' + queryParamString,
-    headers: Object.assign({}, baseOptions.headers, {
-      'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
-    })
+  const headers = Object.assign({}, baseOptions.headers, {
+    'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
   });
 
-  return rp.get(getSubmissionsOptions)
-    .then((body) => {
-      const jsonBody = JSON.parse(body);
+  return axios.get(baseOptions.url + '/submissions?' + queryParamString, {
+    headers: headers
+  }).then((body) => {
+      const jsonBody = body.data
       const existingSubmissions = jsonBody.data.submissions;
 
       // Look for a submission with the same entityType -- need to do this here because
@@ -116,17 +109,13 @@ const getExistingSubmission = function(submission, baseOptions) {
  * @param {String} measurementSetId
  * @return {Object}
  */
-const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId) {
-  const putMeasurementSetOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/measurement-sets/' + measurementSetId,
-    body: JSON.stringify(measurementSet)
+export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, JSON.stringify(measurementSet), {
+    headers:baseOptions.headers
+  }).then((body) => {
+    // Assuming a 200 response here
+    return body.data.data.measurementSet;
   });
-
-  return rp.put(putMeasurementSetOptions)
-    .then((body) => {
-      // Assuming a 200 response here
-      return JSON.parse(body).data.measurementSet;
-    });
 };
 
 /*
@@ -138,17 +127,13 @@ const putMeasurementSet = function(measurementSet, baseOptions, measurementSetId
  * @param {Object} baseOptions
  * @return {Object}
  */
-const postMeasurementSet = function(measurementSet, baseOptions) {
-  const postMeasurementSetOptions = Object.assign({}, baseOptions, {
-    url: baseOptions.url + '/measurement-sets',
-    body: JSON.stringify(measurementSet)
+export function postMeasurementSet(measurementSet, baseOptions) {
+  return axios.post(baseOptions.url + '/measurement-sets', JSON.stringify(measurementSet), {
+    headers: baseOptions.headers
+  }).then((body) => {
+    // Assuming a 201 response here
+    return body.data.data.measurementSet;
   });
-
-  return rp.post(postMeasurementSetOptions)
-    .then((body) => {
-      // Assuming a 201 response here
-      return JSON.parse(body).data.measurementSet;
-    });
 };
 
 /*
@@ -164,7 +149,7 @@ const postMeasurementSet = function(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-const submitMeasurementSets = function(existingSubmission, submission, baseOptions) {
+export function submitMeasurementSets(existingSubmission, submission, baseOptions) {
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
@@ -204,7 +189,7 @@ const submitMeasurementSets = function(existingSubmission, submission, baseOptio
   return promises;
 };
 
-module.exports = {
+export const fileUploaderUtil = {
   validateSubmission,
   getExistingSubmission,
   putMeasurementSet,
