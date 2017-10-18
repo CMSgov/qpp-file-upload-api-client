@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 /*
- * Function for validating a submission Object using the /submissions/validate
+ * Function for validating a submission Object using the /public/validate-submission
  * endpoint. Returns the validated submission if it was successful -- if there
  * was an error, we throw an error
  *
