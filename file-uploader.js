@@ -2,7 +2,7 @@ import { fileUploaderUtil } from './file-uploader-util';
 
 /*
  * Main function to be exported from this file. Calls individual functions to
- * parse the submission body given, validate it with the POST /submissions/validate
+ * parse the submission body given, validate it with the POST /public/validate-submission
  * endpoint, look for an existing submission matching the file's submission's parameters,
  * and then POST or PUT measurementSets from the file.
  *
