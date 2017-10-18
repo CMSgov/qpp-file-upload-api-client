@@ -57,11 +57,11 @@ describe('fileUploaderUtils', () => {
       }));
     });
 
-    it('makes a network call to POST /submissions/public/validate-submission and returns the submission if successful', () => {
+    it('makes a network call to POST /public/validate-submission and returns the submission if successful', () => {
       return validateSubmission(validSubmission, 'JSON', baseOptions)
         .then((returnedSubmission) => {
           sinon.assert.calledOnce(axiosPostStub);
-          assert.strictEqual(axiosPostStub.firstCall.args[0], '/submissions/public/validate-submission');
+          assert.strictEqual(axiosPostStub.firstCall.args[0], '/public/validate-submission');
 
           assert.deepEqual(validSubmission, returnedSubmission);
         });
