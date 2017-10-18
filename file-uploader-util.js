@@ -28,7 +28,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
     });
   };
 
-  return axios.post(baseOptions.url + '/submissions/validate', submission, {
+  return axios.post(baseOptions.url + '/submissions/public/validate-submission', submission, {
     headers: headers
   }).then((body) => {
     const validatedSubmission = body.data.data.submission;
