@@ -78,13 +78,13 @@ export function getExistingSubmission(submission, baseOptions) {
   return axios.get(baseOptions.url + '/submissions?' + queryParamString, {
     headers: headers
   }).then((body) => {
-      const jsonBody = body.data
+      const jsonBody = body.data;
       const existingSubmissions = jsonBody.data.submissions;
 
       // Look for a submission with the same entityType -- need to do this here because
       // we can't filter on entityType in our API call to GET /submissions
       const matchingExistingSubmissions = jsonBody.data.submissions.filter((existingSubmission) => {
-        return existingSubmission.entityType = submission.entityType;
+        return existingSubmission.entityType === submission.entityType;
       });
 
       if (matchingExistingSubmissions.length > 1) {

@@ -174,6 +174,34 @@ describe('fileUploaderUtils', () => {
           assert.throws(() => {throw err}, 'Could not determine which existing Submission matches request');
         });
     });
+
+    it('filters existing submissions on entityType if there are more than 1 matching', () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              submissions: [{
+                entityId: '123456',
+                entityType: 'individual'
+              }, {
+                entityId: '234567',
+                entityType: 'group'
+              }]
+            }
+          }
+        });
+      }));
+
+      return getExistingSubmission(validSubmission, baseOptions)
+        .then((returnedSubmission) => {
+          sinon.assert.calledOnce(axiosGetStub);
+          assert.strictEqual(axiosGetStub.firstCall.args[0], '/submissions?nationalProviderIdentifier=' + validSubmission.nationalProviderIdentifier);
+
+          assert.exists(returnedSubmission);
+          assert.strictEqual(returnedSubmission.entityId, '123456');
+          assert.strictEqual(returnedSubmission.entityType, 'individual');
+        });
+    });
   });
 
   describe('putMeasurementSet', () => {
