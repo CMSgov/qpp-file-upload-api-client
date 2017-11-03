@@ -23,9 +23,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
   } else {
     // Returning a promise here with an Error thrown to be consistent with
     // other errors
-    return new Promise((resolve, reject) => {
-      throw new Error('Invalid format');
-    });
+    return Promise.reject(createErrorResponse('ValidationError', 'Invalid file type'));
   };
 
   return axios.post(baseOptions.url + '/public/validate-submission', submission, {
@@ -33,11 +31,35 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
   }).then((body) => {
     const validatedSubmission = body.data.data.submission;
 
+    // The submission must have measurement sets
     if (!validatedSubmission.measurementSets || validatedSubmission.measurementSets.length === 0) {
-      throw new Error('At least one measurementSet must be defined to use this functionality');
+      let message = 'At least one measurementSet must be defined to use this functionality';
+      return Promise.reject(createErrorResponse('ValidationError', message,
+        createErrorDetails('Submission', ['measurementSets', null, message])
+      ));
     };
 
+    // cmsWebInterface is not an allowed submission method via file upload
+    let errorDetails = [];
+    validatedSubmission.measurementSets.forEach((ms, i) => {
+      if (ms.submissionMethod === 'cmsWebInterface') {
+        errorDetails.push([
+          'submissionMethod',
+          `measurementSets[${i}]`,
+          `'cmsWebInterface' is not allowed via file upload`
+        ]);
+      }
+    });
+
+    if (errorDetails.length) {
+      return Promise.reject(createErrorResponse('ValidationError',
+        `'cmsWebInterface' is not allowed via file upload`,
+        createErrorDetails('Submission', ...errorDetails)));
+    }
+
     return validatedSubmission;
+  }).catch(err => {
+    return Promise.reject((err && err.response && err.response.data) || err);
   });
 };
 
@@ -83,12 +105,14 @@ export function getExistingSubmission(submission, baseOptions) {
 
       // Look for a submission with the same entityType -- need to do this here because
       // we can't filter on entityType in our API call to GET /submissions
-      const matchingExistingSubmissions = jsonBody.data.submissions.filter((existingSubmission) => {
+      const matchingExistingSubmissions = existingSubmissions.filter((existingSubmission) => {
         return existingSubmission.entityType === submission.entityType;
       });
 
       if (matchingExistingSubmissions.length > 1) {
-        throw new Error('Could not determine which existing Submission matches request');
+        return Promise.reject(
+          createErrorResponse('ValidationError', 'Could not determine which existing Submission matches request')
+        );
       };
 
       if (matchingExistingSubmissions.length === 0) {
@@ -196,3 +220,43 @@ export const fileUploaderUtil = {
   postMeasurementSet,
   submitMeasurementSets
 };
+
+/**
+ * ************************************
+ * Private functions
+ * *************************************
+ */
+
+/*
+ * Formats the error type, message, and details into an proper error response object
+ *
+ * @param {string} type - The type of object that is invalid
+ * @param {string} message - The base error message
+ * @param {Array<{ message: string, path: string }>} [details] - The details of invalid fields in the invalid object
+ * 
+ * @return {{type: string, message: string, details: Array<{ message: string, path: string }>}}
+ */
+function createErrorResponse(type, message, details) {
+  return {
+    type,
+    message,
+    details
+  };
+}
+
+/*
+ * Formats field-level details for an invalid object
+ *
+ * @param {string} type - The type of object that is invalid
+ * @param {...[field: string, path: string, message: string]>} details - Pass through an unlimited number of arrays containing field, path, and a message for additional field details
+ * 
+ * @return {{message: string, path: string}}
+ */
+function createErrorDetails(type, ...details) {
+  return details.map(([field, path, message]) => {
+    return {
+      message: `field '${field}' in ${type}${path ? '.' + path : ''} is invalid: ${message}`,
+      path: `$${path ? '.' + path : ''}.${field}`
+    };
+  });
+}

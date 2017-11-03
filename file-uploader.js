@@ -13,6 +13,24 @@ import { fileUploaderUtil } from './file-uploader-util';
  * @param {Function} callback
  *
  * @return {Promise}
+ * 
+ * Note: Error Format
+ * {
+ * "error": {
+ *   "type": "ValidationError",
+ *   "message": "invalid submission object",
+ *   "details": [
+ *     {
+ *       "message": "field 'submissionMethod' in Submission.measurementSets[0] is invalid: cmsWebInterface is not allowed via file upload",
+ *       "path": "$.measurementSets[0].submissionMethod"
+ *     },
+ *     {
+ *       "message": "field 'submissionMethod' in Submission.measurementSets[1] is invalid: cmsWebInterface is not allowed via file upload",
+ *       "path": "$.measurementSets[1].submissionMethod"
+ *     }
+ *   ]
+ * }
+ *}
  */
 export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let validatedSubmission;
