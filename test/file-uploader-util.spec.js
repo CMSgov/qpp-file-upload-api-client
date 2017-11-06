@@ -70,7 +70,11 @@ describe('fileUploaderUtils', () => {
     it('throws an error if submissionFormat is something other than XML or JSON', () => {
       return validateSubmission(validSubmission, 'FAKE', baseOptions)
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Invalid format');
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: 'Invalid file type',
+            details: undefined
+          });
         });
     });
 
@@ -101,7 +105,46 @@ describe('fileUploaderUtils', () => {
 
       return validateSubmission(validSubmissionNoMsets, 'JSON', baseOptions)
         .catch((err) => {
-          assert.throws(() => {throw err}, 'At least one measurementSet must be defined to use this functionality');
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: 'At least one measurementSet must be defined to use this functionality',
+            details: [
+              {
+                message: 'field \'measurementSets\' in Submission is invalid: At least one measurementSet must be defined to use this functionality',
+                path: '$.measurementSets'
+              }
+            ]
+          });
+        });
+    });
+
+    it('throws an error if there are measurementSets with submissionMethod cmsWebInterface', () => {
+      const validSubmissionBadSubmissionMethod = Object.assign({}, validSubmission, {measurementSets: [
+        { submissionMethod: 'cmsWebInterface' }
+      ]});
+      axiosPostStub.restore();
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              submission: validSubmissionBadSubmissionMethod
+            }
+          }
+        });
+      }));
+
+      return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
+        .catch((err) => {
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: '\'cmsWebInterface\' is not allowed via file upload',
+            details: [
+              {
+                message: 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'cmsWebInterface\' is not allowed via file upload',
+                path: '$.measurementSets[0].submissionMethod'
+              }
+            ]
+          });
         });
     });
 
@@ -171,7 +214,11 @@ describe('fileUploaderUtils', () => {
 
       return getExistingSubmission(validSubmission, baseOptions)
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Could not determine which existing Submission matches request');
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: 'Could not determine which existing Submission matches request',
+            details: undefined
+          });
         });
     });
 
