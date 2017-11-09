@@ -84,13 +84,18 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others
-      const caughtPromises = postAndPutPromises.map(promise => promise.catch(Error));
+      const caughtPromises = postAndPutPromises.map(promise => promise.catch(err => {
+        return {
+          error: err
+        };
+      }));
+
       return Promise.all(caughtPromises);
     }).then((postAndPutOutputs) => {
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
-        if (postOrPutOutput instanceof Error) {
-          errs.push(postOrPutOutput);
+        if (postOrPutOutput && postOrPutOutput.error) {
+          errs.push(postOrPutOutput.error);
         } else {
           createdMeasurementSets.push(postOrPutOutput);
         };

@@ -59,7 +59,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
 
     return validatedSubmission;
   }).catch(err => {
-    return Promise.reject((err && err.response && err.response.data) || err);
+    return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
 };
 
@@ -120,6 +120,8 @@ export function getExistingSubmission(submission, baseOptions) {
       };
 
       return matchingExistingSubmissions[0];
+    }).catch(err => {
+      return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
     });
 };
 
@@ -139,6 +141,8 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
   }).then((body) => {
     // Assuming a 200 response here
     return body.data.data.measurementSet;
+  }).catch(err => {
+    return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
 };
 
@@ -157,6 +161,8 @@ export function postMeasurementSet(measurementSet, baseOptions) {
   }).then((body) => {
     // Assuming a 201 response here
     return body.data.data.measurementSet;
+  }).catch(err => {
+    return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
 };
 
@@ -200,6 +206,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
       return existingMeasurementSet.submissionMethod === measurementSet.submissionMethod &&
         existingMeasurementSet.category === measurementSet.category;
     });
+
     if (matchingMeasurementSets.length > 0) {
       // Do a PUT
       const matchingMeasurementSetId = matchingMeasurementSets[0].id;
