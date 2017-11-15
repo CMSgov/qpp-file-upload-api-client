@@ -137,10 +137,40 @@ describe('fileUploaderUtils', () => {
         .catch((err) => {
           assert.deepEqual(err, {
             type: 'ValidationError',
-            message: '\'cmsWebInterface\' is not allowed via file upload',
+            message: 'Measurement set contains a disallowed submission method',
             details: [
               {
                 message: 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'cmsWebInterface\' is not allowed via file upload',
+                path: '$.measurementSets[0].submissionMethod'
+              }
+            ]
+          });
+        });
+    });
+
+    it('throws an error if there are measurementSets with submissionMethod webAttestation', () => {
+      const validSubmissionBadSubmissionMethod = Object.assign({}, validSubmission, {measurementSets: [
+        { submissionMethod: 'webAttestation' }
+      ]});
+      axiosPostStub.restore();
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              submission: validSubmissionBadSubmissionMethod
+            }
+          }
+        });
+      }));
+
+      return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
+        .catch((err) => {
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: 'Measurement set contains a disallowed submission method',
+            details: [
+              {
+                message: 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'webAttestation\' is not allowed via file upload',
                 path: '$.measurementSets[0].submissionMethod'
               }
             ]

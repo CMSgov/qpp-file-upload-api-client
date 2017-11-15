@@ -46,7 +46,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
         errorDetails.push([
           'submissionMethod',
           `measurementSets[${i}]`,
-          `Submission method '${ms.submissionMethod}' is not allowed via file upload`
+          `'${ms.submissionMethod}' is not allowed via file upload`
         ]);
       }
     });
