@@ -42,18 +42,18 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
     // cmsWebInterface is not an allowed submission method via file upload
     let errorDetails = [];
     validatedSubmission.measurementSets.forEach((ms, i) => {
-      if (ms.submissionMethod === 'cmsWebInterface') {
+      if (['cmsWebInterface', 'webAttestation'].indexOf(ms.submissionMethod) !== -1) {
         errorDetails.push([
           'submissionMethod',
           `measurementSets[${i}]`,
-          `'cmsWebInterface' is not allowed via file upload`
+          `'${ms.submissionMethod}' is not allowed via file upload`
         ]);
       }
     });
 
     if (errorDetails.length) {
       return Promise.reject(createErrorResponse('ValidationError',
-        `'cmsWebInterface' is not allowed via file upload`,
+        `Measurement set contains a disallowed submission method`,
         createErrorDetails('Submission', ...errorDetails)));
     }
 
