@@ -1,4 +1,4 @@
-# qpp-file-upload-api-client
+# qpp-file-upload-api-client [![Build Status](https://travis-ci.org/CMSgov/qpp-file-upload-api-client.svg?branch=master)](https://travis-ci.org/CMSgov/qpp-file-upload-api-client)
 A set of functions to call the QPP Submissions API in common manner, such as for the file upload use case.
 
 To use, simply `npm install qpp-file-upload-api-client`
