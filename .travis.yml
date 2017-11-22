@@ -21,7 +21,8 @@ deploy:
       secure: mZB/nXEpclGM1ClBJQ9mEMSyi9vUrC6I/SceSg9Q5gKTP+aFjVMvtUnMso9iYOPyxVD+gdfgGDiLAdbQr1MitM1n1103vUab6QPhXFFWrBk/QzZ81a9PA9oeSTQevkv9C2FNJTvoH5t5A2iuKjUYyR+3IWfQRYaKMUX2py5DGFX/X1b/JCDYJopmsm91Pa51I3A3VVWqr+6OdqxVacl76++J63iFHqO60SaY4/QAzTvbUn7PTBY54XpHYmrGd0PrqKzgRA4gc7aSeqxc2b31XrC3ALw52sNjELaTkkLQI6njF/93pHrlmlWzaYjWM0Mqo+1nBUgM6UYGyEifnSM9fu5wFRAGImDq/NqqtyO70unbAADInpTkI5ONf+LCWol+NgHPse+qlDf9/FFu7am0N2XOvmFstMAIdA4cU7n4x3ntFghFCBpHWfkb1n+I8cRGYecqF9wfcQAfnYDa+Pr0k+I3j0S5K+JNmuwRTkKvyvzoBsqgjWTxlnPuhfoRa2zTRIp7iyx9uEV3dG+p2cp8XEi2ANsK5wY6BBFvXGP8EnHS/kIcRfadXxXyxXIAV94PWSHCufwx/JSpSIiMo0eejzMqBGBXgE7NVtbQJSnrCzDU1O5e/s8u4oazeWWx91AFNBlG2YYnqjrhrbIcKZK0c4yoGdZavx5XixSgLAC6rf0=
     file: "RELEASE-NOTES.md"
     body: "${RELEASE_NOTES}"
-    draft: true
+    draft: false
+    prerelease: true
     on:
       repo: CMSgov/qpp-file-upload-api-client
       tags: true
