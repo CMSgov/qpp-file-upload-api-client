@@ -6,12 +6,22 @@ cache:
 before_deploy:
   - npm run clean
   - npm run build:prod
+  - npm install jshon
+  - export RELEASE_NOTES=$(npx jshon -s "$(cat RELEASE-NOTES.md)")
 deploy:
-  provider: npm
-  email: biju.joseph@semanticbits.com
-  api_key:
-    secure: X5WSSBMAaU0q2EWe5EQpwghZ/RE6Uo9CHAwoON5BOs6C+PTR0zGsT3RKN9Ec+r/fEST2Lvmdvl6Z6TuI9THiD61HQ2uZCon1PkTnXgO+cgg4tnorccAk2fyykOpxEttvetSVNuR/Zpqc2YT6NvwkPKYwK9cgmg2PHyqA0RM6VPQhDmukaMrNP/TtlWJp4w5cxZW78lfxDHnie/fMLfz/qfeF+xGwLV91cHdlzK4tNuug/2QfzlwUSzRMwgE7WnnGQUvJl+Kc//IXAVZj3aPtxl3aK5AxBH0bPacalafCSwlMzYLOR9JHrnHg6flM1gi1BcsxgdEiv2UPBWDT0A0DJTNHHmp1Fto3W8wtsnEWtnxVd08T9fAGhPuDtFknv1yDxPWG6CBCobro1Xphk5PLgu5Ixu3HM2y4sR0JIRZgwTA3qlGGsj1f0ZAPmhI75d5vulCLLOoOe9uO8jWbEeExcfoZtOhWrijYQ9sm8OhI3sauV6MCLt4M5pDqDwP669ZI6imXSTXdx+D2vjJCyuRsLoIECkplOGE+SCCd9wsoF7tkTQQIrDnZ8aT/YhDwsC4Fr3s/M4fJtkJMqtNf+7NFZMX2Sq5VajQLlTEnDXp9KnSAa2KVx69F4KWZyRD4yxCWLSdRkEoXMxnwQXyMgZmCF0UE5RThjg5a/vKZzgaJL8s=
-  tag: next
-  on:
-    branch: master
-    repo: CMSgov/qpp-file-upload-api-client
+  - provider: npm
+    email: biju.joseph@semanticbits.com
+    api_key:
+      secure: X5WSSBMAaU0q2EWe5EQpwghZ/RE6Uo9CHAwoON5BOs6C+PTR0zGsT3RKN9Ec+r/fEST2Lvmdvl6Z6TuI9THiD61HQ2uZCon1PkTnXgO+cgg4tnorccAk2fyykOpxEttvetSVNuR/Zpqc2YT6NvwkPKYwK9cgmg2PHyqA0RM6VPQhDmukaMrNP/TtlWJp4w5cxZW78lfxDHnie/fMLfz/qfeF+xGwLV91cHdlzK4tNuug/2QfzlwUSzRMwgE7WnnGQUvJl+Kc//IXAVZj3aPtxl3aK5AxBH0bPacalafCSwlMzYLOR9JHrnHg6flM1gi1BcsxgdEiv2UPBWDT0A0DJTNHHmp1Fto3W8wtsnEWtnxVd08T9fAGhPuDtFknv1yDxPWG6CBCobro1Xphk5PLgu5Ixu3HM2y4sR0JIRZgwTA3qlGGsj1f0ZAPmhI75d5vulCLLOoOe9uO8jWbEeExcfoZtOhWrijYQ9sm8OhI3sauV6MCLt4M5pDqDwP669ZI6imXSTXdx+D2vjJCyuRsLoIECkplOGE+SCCd9wsoF7tkTQQIrDnZ8aT/YhDwsC4Fr3s/M4fJtkJMqtNf+7NFZMX2Sq5VajQLlTEnDXp9KnSAa2KVx69F4KWZyRD4yxCWLSdRkEoXMxnwQXyMgZmCF0UE5RThjg5a/vKZzgaJL8s=
+    on:
+      tags: true
+      repo: CMSgov/qpp-file-upload-api-client
+  - provider: releases
+    api_key:
+      secure: mZB/nXEpclGM1ClBJQ9mEMSyi9vUrC6I/SceSg9Q5gKTP+aFjVMvtUnMso9iYOPyxVD+gdfgGDiLAdbQr1MitM1n1103vUab6QPhXFFWrBk/QzZ81a9PA9oeSTQevkv9C2FNJTvoH5t5A2iuKjUYyR+3IWfQRYaKMUX2py5DGFX/X1b/JCDYJopmsm91Pa51I3A3VVWqr+6OdqxVacl76++J63iFHqO60SaY4/QAzTvbUn7PTBY54XpHYmrGd0PrqKzgRA4gc7aSeqxc2b31XrC3ALw52sNjELaTkkLQI6njF/93pHrlmlWzaYjWM0Mqo+1nBUgM6UYGyEifnSM9fu5wFRAGImDq/NqqtyO70unbAADInpTkI5ONf+LCWol+NgHPse+qlDf9/FFu7am0N2XOvmFstMAIdA4cU7n4x3ntFghFCBpHWfkb1n+I8cRGYecqF9wfcQAfnYDa+Pr0k+I3j0S5K+JNmuwRTkKvyvzoBsqgjWTxlnPuhfoRa2zTRIp7iyx9uEV3dG+p2cp8XEi2ANsK5wY6BBFvXGP8EnHS/kIcRfadXxXyxXIAV94PWSHCufwx/JSpSIiMo0eejzMqBGBXgE7NVtbQJSnrCzDU1O5e/s8u4oazeWWx91AFNBlG2YYnqjrhrbIcKZK0c4yoGdZavx5XixSgLAC6rf0=
+    file: "RELEASE-NOTES.md"
+    body: "${RELEASE_NOTES}"
+    draft: true
+    on:
+      repo: CMSgov/qpp-file-upload-api-client
+      tags: true
