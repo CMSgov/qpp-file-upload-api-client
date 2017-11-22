@@ -1,4 +1,4 @@
 
-## [1.2.1] - 2017-11-21
+## [1.2.2] - 2017-11-21
 ### Added
-- Automatic draft release notes on tags
+- Automatic prerelease release notes on tags
