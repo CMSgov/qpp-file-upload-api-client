@@ -1,4 +1,4 @@
 
-## [1.2.2] - 2017-11-21
+## [1.2.3] - 2017-12-08
 ### Added
-- Automatic prerelease release notes on tags
+- Added cpc+ for group practice submissions
