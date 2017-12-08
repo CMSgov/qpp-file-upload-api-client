@@ -201,10 +201,11 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
       }});
     };
 
-    // Look for existing measurementSets with the same category + submissionMethod
+    // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
-      return existingMeasurementSet.submissionMethod === measurementSet.submissionMethod &&
-        existingMeasurementSet.category === measurementSet.category;
+      return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
+        (existingMeasurementSet.category === measurementSet.category) &&
+        (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId !== measurementSet.practiceId : true)
     });
 
     if (matchingMeasurementSets.length > 0) {

@@ -36,6 +36,26 @@ const validSubmission = {
   }]
 };
 
+const cpcPlusSubmission = {
+  programName: 'mips',
+  entityType: 'individual',
+  taxpayerIdentificationNumber: '000123456',
+  nationalProviderIdentifier: '0123456789',
+  performanceYear: 2017,
+  measurementSets: [{
+    category: 'quality',
+    programName: 'cpcPlus',
+    practiceId: '000123458',
+    submissionMethod: 'registry',
+    performanceStart: '2017-01-01',
+    performanceEnd: '2017-06-01',
+    measurements: [{
+      measureId: 'IA_EPA_4',
+      value: true
+    }]
+  }]
+};
+
 describe('fileUploaderUtils', () => {
   const sandbox = sinon.sandbox.create();
 
@@ -422,6 +442,55 @@ describe('fileUploaderUtils', () => {
         .then((promiseOutputs) => {
           sinon.assert.calledOnce(axiosPostStub)
           sinon.assert.calledOnce(axiosPutStub)
+        });
+    });
+
+    it('will call POST for additional cpcPlus measurement sets', () => {
+      const validSubmissionMoreMSets = Object.assign({}, cpcPlusSubmission);
+      validSubmissionMoreMSets.measurementSets.push(
+      {
+        category: 'quality',
+        submissionMethod: 'electronicHealthRecord',
+        programName: 'cpcPlus',
+        practiceId: '000123749',
+        performanceStart: '2017-01-01',
+        performanceEnd: '2017-06-01',
+        measurements: [{
+          measureId: 'IA_EPA_4',
+          value: true
+        }]
+      });
+
+      const existingSubmission = {
+        id: '001',
+        measurementSets: [{
+          category: 'ia',
+          submissionMethod: 'registry',
+          performanceStart: '2017-01-01',
+          performanceEnd: '2017-06-01',
+          measurements: [{
+            measureId: 'IA_EPA_4',
+            value: true
+          }]
+        }, {
+          category: 'aci',
+          submissionMethod: 'registry',
+          performanceStart: '2017-01-01',
+          performanceEnd: '2017-06-01',
+          measurements: [{
+            measureId: 'ACI_HIE_3',
+            value: {
+              numerator: 1,
+              denominator: 2
+            }
+          }]
+        }]
+      };
+
+      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
+      return Promise.all(promiseArray)
+        .then((promiseOutputs) => {
+          sinon.assert.called(axiosPostStub)
         });
     });
   });
