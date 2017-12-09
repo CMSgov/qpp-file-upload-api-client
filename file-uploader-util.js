@@ -205,7 +205,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
       return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
         (existingMeasurementSet.category === measurementSet.category) &&
-        (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId !== measurementSet.practiceId : true)
+        (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
     });
 
     if (matchingMeasurementSets.length > 0) {
