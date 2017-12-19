@@ -42,11 +42,11 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
     // cmsWebInterface is not an allowed submission method via file upload
     let errorDetails = [];
     validatedSubmission.measurementSets.forEach((ms, i) => {
-      if (['cmsWebInterface', 'webAttestation'].indexOf(ms.submissionMethod) !== -1) {
+      if (['registry', 'electronicHealthRecord'].indexOf(ms.submissionMethod) === -1) {
         errorDetails.push([
           'submissionMethod',
           `measurementSets[${i}]`,
-          `'${ms.submissionMethod}' is not allowed via file upload`
+          `'${ms.submissionMethod}' submission method is not allowed via file upload. registry and electronicHealthRecord are the only allowed submission methods.`
         ]);
       }
     });
