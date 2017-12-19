@@ -1,6 +1,4 @@
 
-## [1.2.7] - 2017-12-09
+## [1.2.8] - 2017-12-19
 ### Added
-- Added cpc+ for group practice submissions.
-- Removed few files from gitignore. 
-- Checked in dist folder
+- Submission method validation, only allow registry and EHR submissions.
