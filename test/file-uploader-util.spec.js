@@ -153,6 +153,9 @@ describe('fileUploaderUtils', () => {
         });
       }));
 
+      const errorMessage = 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'cmsWebInterface\' submission method' +
+          ' is not allowed via file upload. registry and electronicHealthRecord are the only allowed submission methods.';
+
       return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
         .catch((err) => {
           assert.deepEqual(err, {
@@ -160,7 +163,7 @@ describe('fileUploaderUtils', () => {
             message: 'Measurement set contains a disallowed submission method',
             details: [
               {
-                message: 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'cmsWebInterface\' is not allowed via file upload',
+                message: errorMessage,
                 path: '$.measurementSets[0].submissionMethod'
               }
             ]
@@ -183,6 +186,9 @@ describe('fileUploaderUtils', () => {
         });
       }));
 
+      const errorMessage = 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'webAttestation\' submission method' +
+          ' is not allowed via file upload. registry and electronicHealthRecord are the only allowed submission methods.';
+
       return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
         .catch((err) => {
           assert.deepEqual(err, {
@@ -190,13 +196,46 @@ describe('fileUploaderUtils', () => {
             message: 'Measurement set contains a disallowed submission method',
             details: [
               {
-                message: 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'webAttestation\' is not allowed via file upload',
+                message: errorMessage,
                 path: '$.measurementSets[0].submissionMethod'
               }
             ]
           });
         });
     });
+
+      it('throws an error if there are measurementSets with non-existent submissionMethod', () => {
+          const validSubmissionBadSubmissionMethod = Object.assign({}, validSubmission, {measurementSets: [
+              { submissionMethod: 'madeUpSubmissionMethod' }
+          ]});
+          axiosPostStub.restore();
+          axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+              resolve({
+                  data: {
+                      data: {
+                          submission: validSubmissionBadSubmissionMethod
+                      }
+                  }
+              });
+          }));
+
+          const errorMessage = 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'madeUpSubmissionMethod\' submission method' +
+              ' is not allowed via file upload. registry and electronicHealthRecord are the only allowed submission methods.';
+
+          return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
+              .catch((err) => {
+                  assert.deepEqual(err, {
+                      type: 'ValidationError',
+                      message: 'Measurement set contains a disallowed submission method',
+                      details: [
+                          {
+                              message: errorMessage,
+                              path: '$.measurementSets[0].submissionMethod'
+                          }
+                      ]
+                  });
+              });
+      });
 
     it('will use the Submissions API to convert XML to JSON', () => {
       // Don't need to actually send an XML submission here, just making
