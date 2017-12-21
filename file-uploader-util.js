@@ -1,4 +1,6 @@
 import axios from 'axios';
+import * as jwtDecode from 'jwt-decode';
+
 
 /*
  * Function for validating a submission Object using the /public/validate-submission
@@ -179,7 +181,12 @@ export function postMeasurementSet(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-export function submitMeasurementSets(existingSubmission, submission, baseOptions) {
+export function submitMeasurementSets(existingSubmission, submission, baseOptions, JWT) {
+  let organizations = [];
+  if (JWT) {
+      organizations = jwtDecode.default(JWT).data.organizations;
+  }
+  const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
@@ -208,9 +215,15 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
         (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
     });
 
-    if (matchingMeasurementSets.length > 0) {
+    const matchingSet = matchingMeasurementSets[0];
+
+    const isOrganzation = organizations.some(org => org.id === matchingSet.submitterId);
+
+    const isIndividual = matchingSet && matchingSet.submitterId === 'securityOfficial' && !isRegistryUser;
+
+    if (matchingSet && (isIndividual || isOrganzation)) {
       // Do a PUT
-      const matchingMeasurementSetId = matchingMeasurementSets[0].id;
+      const matchingMeasurementSetId = matchingSet.id;
       promises.push(putMeasurementSet(measurementSetToSubmit, baseOptions, matchingMeasurementSetId));
     } else {
       // Do a POST

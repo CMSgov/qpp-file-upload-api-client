@@ -80,7 +80,7 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
       };
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions);
+      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions, JWT);
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others

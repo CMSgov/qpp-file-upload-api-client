@@ -434,7 +434,7 @@ describe('fileUploaderUtils', () => {
       });
     });
 
-    it('will call POST for all new measurementSets and PUT for all existing measurementSets', () => {
+    it('will call POST for all new measurementSets', () => {
       const validSubmissionMoreMSets = Object.assign({}, validSubmission);
       validSubmissionMoreMSets.measurementSets.push({
         category: 'aci',
@@ -479,8 +479,7 @@ describe('fileUploaderUtils', () => {
       const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.calledOnce(axiosPostStub)
-          sinon.assert.calledOnce(axiosPutStub)
+          sinon.assert.calledTwice(axiosPostStub)
         });
     });
 
