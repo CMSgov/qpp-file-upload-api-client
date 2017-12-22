@@ -220,9 +220,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     });
 
     const matchingSet = matchingMeasurementSets[0];
-
     const isOrganzation = organizations.some(org => org.id === matchingSet.submitterId);
-
     const isIndividual = matchingSet && matchingSet.submitterId === 'securityOfficial' && !isRegistryUser;
 
     if (matchingSet && (isIndividual || isOrganzation)) {
