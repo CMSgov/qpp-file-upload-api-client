@@ -1,4 +1,4 @@
 
-## [1.2.9] - 2017-12-19
+## [1.2.10] - 2017-12-22
 ### Added
-- Submission method validation, only allow registry and EHR submissions.
+- Refactor PUT vs POST to avoid accidental overwriting requests.
