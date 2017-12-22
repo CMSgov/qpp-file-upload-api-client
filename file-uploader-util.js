@@ -213,19 +213,28 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     };
 
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
+
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
-      return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
-        (existingMeasurementSet.category === measurementSet.category) &&
-        (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
+        if (organizations.length > 0) {
+            return organizations.some(org => org.id === existingMeasurementSet.submitterId);
+        } else if (isRegistryUser) {
+            return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
+                (existingMeasurementSet.category === measurementSet.category) &&
+                (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true);
+        } else {
+            return (existingMeasurementSet.submitterId === 'securityOfficial' && (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
+            (existingMeasurementSet.category === measurementSet.category) &&
+            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true));
+        }
     });
 
     const matchingSet = matchingMeasurementSets[0];
     const isOrganzation = organizations.some(org => org.id === matchingSet.submitterId);
     const isIndividual = matchingSet && matchingSet.submitterId === 'securityOfficial' && !isRegistryUser;
 
-    if (matchingSet && (isIndividual || isOrganzation)) {
+    if (matchingMeasurementSets.length > 0) {
       // Do a PUT
-      const matchingMeasurementSetId = matchingSet.id;
+      const matchingMeasurementSetId = matchingMeasurementSets[0].id;
       promises.push(putMeasurementSet(measurementSetToSubmit, baseOptions, matchingMeasurementSetId));
     } else {
       // Do a POST
