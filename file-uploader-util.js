@@ -184,7 +184,11 @@ export function postMeasurementSet(measurementSet, baseOptions) {
 export function submitMeasurementSets(existingSubmission, submission, baseOptions, JWT) {
   let organizations = [];
   if (JWT) {
-      organizations = jwtDecode.default(JWT).data.organizations;
+      const decodedJWT = jwtDecode.default(JWT);
+      const data = decodedJWT.data;
+      if (data) {
+          organizations = data.organizations;
+      }
   }
   const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
   const promises = [];
