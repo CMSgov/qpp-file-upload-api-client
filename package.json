@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
-    "axios": "^0.16.2"
+    "axios": "^0.16.2",
+    "jwt-decode": "^2.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

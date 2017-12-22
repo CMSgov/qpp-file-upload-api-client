@@ -1,4 +1,6 @@
 import axios from 'axios';
+import * as jwtDecode from 'jwt-decode';
+
 
 /*
  * Function for validating a submission Object using the /public/validate-submission
@@ -179,7 +181,10 @@ export function postMeasurementSet(measurementSet, baseOptions) {
  * @param {Object} baseOptions
  * @return {Array<Promise>}
  */
-export function submitMeasurementSets(existingSubmission, submission, baseOptions) {
+export function submitMeasurementSets(existingSubmission, submission, baseOptions, JWT) {
+  let token = JWT && jwtDecode.default(JWT);
+  let organizations = (token && token.data && token.data.organizations) || [];
+  const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
@@ -202,10 +207,17 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     };
 
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
+
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
-      return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
-        (existingMeasurementSet.category === measurementSet.category) &&
-        (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
+        return (
+            (
+                (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
+                (isRegistryUser && organizations.some(org => ord.id === existingMeasurementSet.submitterId))
+            ) &&
+            (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
+            (existingMeasurementSet.category === measurementSet.category) &&
+            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
+        );
     });
 
     if (matchingMeasurementSets.length > 0) {
