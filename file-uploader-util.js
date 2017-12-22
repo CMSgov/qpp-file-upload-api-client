@@ -228,10 +228,6 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
         }
     });
 
-    const matchingSet = matchingMeasurementSets[0];
-    const isOrganzation = organizations.some(org => org.id === matchingSet.submitterId);
-    const isIndividual = matchingSet && matchingSet.submitterId === 'securityOfficial' && !isRegistryUser;
-
     if (matchingMeasurementSets.length > 0) {
       // Do a PUT
       const matchingMeasurementSetId = matchingMeasurementSets[0].id;
