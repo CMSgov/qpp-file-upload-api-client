@@ -182,14 +182,8 @@ export function postMeasurementSet(measurementSet, baseOptions) {
  * @return {Array<Promise>}
  */
 export function submitMeasurementSets(existingSubmission, submission, baseOptions, JWT) {
-  let organizations = [];
-  if (JWT) {
-      const decodedJWT = jwtDecode.default(JWT);
-      const data = decodedJWT.data;
-      if (data) {
-          organizations = data.organizations;
-      }
-  }
+  let token = JWT && jwtDecode.default(JWT);
+  let organizations = (token && token.data && token.data.organizations) || [];
   const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
   const promises = [];
   submission.measurementSets.forEach((measurementSet) => {
@@ -215,17 +209,15 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
 
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
-        if (organizations.length > 0) {
-            return organizations.some(org => org.id === existingMeasurementSet.submitterId);
-        } else if (isRegistryUser) {
-            return (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
-                (existingMeasurementSet.category === measurementSet.category) &&
-                (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true);
-        } else {
-            return (existingMeasurementSet.submitterId === 'securityOfficial' && (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
+        return (
+            (
+                (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
+                (isRegistryUser && organizations.some(org => ord.id === existingMeasurementSet.submitterId))
+            ) &&
+            (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&
-            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true));
-        }
+            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
+        );
     });
 
     if (matchingMeasurementSets.length > 0) {
