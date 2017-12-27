@@ -107,6 +107,7 @@ describe('fileUploader', () => {
         submissionMethod: 'registry',
         performanceStart: '2017-01-01',
         performanceEnd: '2017-06-01',
+        submitterId: 'securityOfficial',
         measurements: [{
           measureId: 'IA_EPA_4',
           value: false
@@ -164,7 +165,7 @@ describe('fileUploader', () => {
       });
     });
 
-    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', 'testJWT', '', (errs, mSets) => {
+    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', null, '', (errs, mSets) => {
       sinon.assert.calledOnce(axiosPostStub);
       sinon.assert.calledOnce(axiosPutStub);
 
