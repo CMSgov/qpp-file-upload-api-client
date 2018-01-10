@@ -26,7 +26,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
     // Returning a promise here with an Error thrown to be consistent with
     // other errors
     return Promise.reject(createErrorResponse('ValidationError', 'Invalid file type'));
-  };
+  }
 
   return axios.post(baseOptions.url + '/public/validate-submission', submission, {
     headers: headers
@@ -39,7 +39,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
       return Promise.reject(createErrorResponse('ValidationError', message,
         createErrorDetails('Submission', ['measurementSets', null, message])
       ));
-    };
+    }
 
     // cmsWebInterface is not an allowed submission method via file upload
     let errorDetails = [];
@@ -55,7 +55,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
 
     if (errorDetails.length) {
       return Promise.reject(createErrorResponse('ValidationError',
-        `Measurement set contains a disallowed submission method`,
+        'Measurement set contains a disallowed submission method',
         createErrorDetails('Submission', ...errorDetails)));
     }
 
@@ -63,7 +63,7 @@ export function validateSubmission(submission, submissionFormat, baseOptions) {
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
-};
+}
 
 /*
  * Function to retrieve a submission that matches the submission parameters
@@ -84,11 +84,11 @@ export function getExistingSubmission(submission, baseOptions) {
 
   if (submission.nationalProviderIdentifier) {
     queryParams.nationalProviderIdentifier = submission.nationalProviderIdentifier;
-  };
+  }
 
   if (submission.entityId) {
     queryParams.entityId = submission.entityId;
-  };
+  }
 
   // Make a string of URL-encoded query parameters
   const queryParamString = Object.keys(queryParams).map((key) => {
@@ -102,30 +102,30 @@ export function getExistingSubmission(submission, baseOptions) {
   return axios.get(baseOptions.url + '/submissions?' + queryParamString, {
     headers: headers
   }).then((body) => {
-      const jsonBody = body.data;
-      const existingSubmissions = jsonBody.data.submissions;
+    const jsonBody = body.data;
+    const existingSubmissions = jsonBody.data.submissions;
 
-      // Look for a submission with the same entityType -- need to do this here because
-      // we can't filter on entityType in our API call to GET /submissions
-      const matchingExistingSubmissions = existingSubmissions.filter((existingSubmission) => {
-        return existingSubmission.entityType === submission.entityType;
-      });
-
-      if (matchingExistingSubmissions.length > 1) {
-        return Promise.reject(
-          createErrorResponse('ValidationError', 'Could not determine which existing Submission matches request')
-        );
-      };
-
-      if (matchingExistingSubmissions.length === 0) {
-        return;
-      };
-
-      return matchingExistingSubmissions[0];
-    }).catch(err => {
-      return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
+    // Look for a submission with the same entityType -- need to do this here because
+    // we can't filter on entityType in our API call to GET /submissions
+    const matchingExistingSubmissions = existingSubmissions.filter((existingSubmission) => {
+      return existingSubmission.entityType === submission.entityType;
     });
-};
+
+    if (matchingExistingSubmissions.length > 1) {
+      return Promise.reject(
+        createErrorResponse('ValidationError', 'Could not determine which existing Submission matches request')
+      );
+    }
+
+    if (matchingExistingSubmissions.length === 0) {
+      return;
+    }
+
+    return matchingExistingSubmissions[0];
+  }).catch(err => {
+    return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
+  });
+}
 
 /*
  * Function for calling PUT /measurement-sets on the Submissions API. Expects
@@ -146,7 +146,7 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
-};
+}
 
 /*
  * Function for calling POST /measurement-sets on the Submissions API. Expects
@@ -166,7 +166,7 @@ export function postMeasurementSet(measurementSet, baseOptions) {
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
-};
+}
 
 /*
  * Function to submit measurementSets from file via POST or PUT. Given the
@@ -204,20 +204,20 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
         nationalProviderIdentifier: submission.nationalProviderIdentifier || null,
         performanceYear: submission.performanceYear
       }});
-    };
+    }
 
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
 
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
-        return (
-            (
-                (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
-                (isRegistryUser && organizations.some(org => ord.id === existingMeasurementSet.submitterId))
-            ) &&
+      return (
+        (
+          (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
+            (isRegistryUser && organizations.some(org => org.id === existingMeasurementSet.submitterId))
+        ) &&
             (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&
             (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
-        );
+      );
     });
 
     if (matchingMeasurementSets.length > 0) {
@@ -227,11 +227,11 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     } else {
       // Do a POST
       promises.push(postMeasurementSet(measurementSetToSubmit, baseOptions));
-    };
+    }
   });
 
   return promises;
-};
+}
 
 export const fileUploaderUtil = {
   validateSubmission,

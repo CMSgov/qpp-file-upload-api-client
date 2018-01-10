@@ -8,7 +8,9 @@
     "test": "mocha --require babel-register --recursive ./test/**/*.spec.js",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "lint": "eslint file-uploader-util.js file-uploader.js index.js",
+    "pretest": "npm run lint"
   },
   "repository": {
     "type": "git",
@@ -33,9 +35,12 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "eslint": "^4.15.0",
     "mocha": "^3.5.3",
+    "pre-push": "^0.1.1",
     "rimraf": "^2.6.2",
     "sinon": "^4.0.0",
     "webpack": "^3.7.1"
-  }
+  },
+  "pre-push": ["test"]
 }
