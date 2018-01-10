@@ -34,7 +34,7 @@ import { fileUploaderUtil } from './file-uploader-util';
  */
 export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
   let validatedSubmission;
-  let existingSubmission
+  let existingSubmission;
   const errs = [];
   const createdMeasurementSets = [];
 
@@ -69,7 +69,7 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
           performanceYear: validatedSubmission.performanceYear
         }});
         firstMeasurementSetPromise = fileUploaderUtil.postMeasurementSet(firstMeasurementSet, baseOptions);
-      };
+      }
 
       return firstMeasurementSetPromise;
     }).then((firstMeasurementSetOutput) => {
@@ -77,7 +77,7 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
       // no error was thrown), then store the output here
       if (firstMeasurementSetOutput) {
         createdMeasurementSets.push(firstMeasurementSetOutput);
-      };
+      }
 
       // Submit all remaining measurementSets
       const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions, JWT);
@@ -98,7 +98,7 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
           errs.push(postOrPutOutput.error);
         } else {
           createdMeasurementSets.push(postOrPutOutput);
-        };
+        }
       });
 
       // Call the callback with the aggregated error string and list of measurementSets created
@@ -107,4 +107,4 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
       // Call the callback with the aggregated error string and an empty list (no measurementSets created)
       callback([err], []);
     });
-};
+}
