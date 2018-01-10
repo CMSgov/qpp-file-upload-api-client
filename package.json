@@ -9,7 +9,8 @@
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist",
-    "lint": "eslint file-uploader-util.js file-uploader.js index.js"
+    "lint": "eslint file-uploader-util.js file-uploader.js index.js",
+    "pretest": "npm run lint"
   },
   "repository": {
     "type": "git",
