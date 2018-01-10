@@ -212,7 +212,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
       return (
         (
           (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
-                (isRegistryUser && organizations.some(org => org.id === existingMeasurementSet.submitterId))
+            (isRegistryUser && organizations.some(org => org.id === existingMeasurementSet.submitterId))
         ) &&
             (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&
