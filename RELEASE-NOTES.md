@@ -1,4 +1,4 @@
 
-## [1.2.11] - 2017-12-22
+## [1.2.14] - 2018-01-12
 ### Added
-- Refactor PUT vs POST to avoid accidental overwriting requests.
+- minor changes to the way we publish node package
