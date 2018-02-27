@@ -1,3 +1,4 @@
+import { describe, it, afterEach, beforeEach } from 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import axios from 'axios';
@@ -9,11 +10,12 @@ import {
   putMeasurementSet,
   submitMeasurementSets
 } from '../file-uploader-util';
+import { DUMMY_AUTHORIZATION } from './constants';
 
 const baseOptions = {
   url: '',
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json'
   }
 };
@@ -106,7 +108,9 @@ describe('fileUploaderUtils', () => {
 
       return validateSubmission(validSubmission, 'JSON', baseOptions)
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Invalid Submission Object');
+          assert.throws(() => {
+            throw err;
+          }, 'Invalid Submission Object');
         });
     });
 
@@ -204,38 +208,38 @@ describe('fileUploaderUtils', () => {
         });
     });
 
-      it('throws an error if there are measurementSets with non-existent submissionMethod', () => {
-          const validSubmissionBadSubmissionMethod = Object.assign({}, validSubmission, {measurementSets: [
-              { submissionMethod: 'madeUpSubmissionMethod' }
-          ]});
-          axiosPostStub.restore();
-          axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
-              resolve({
-                  data: {
-                      data: {
-                          submission: validSubmissionBadSubmissionMethod
-                      }
-                  }
-              });
-          }));
+    it('throws an error if there are measurementSets with non-existent submissionMethod', () => {
+      const validSubmissionBadSubmissionMethod = Object.assign({}, validSubmission, {measurementSets: [
+        { submissionMethod: 'madeUpSubmissionMethod' }
+      ]});
+      axiosPostStub.restore();
+      axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              submission: validSubmissionBadSubmissionMethod
+            }
+          }
+        });
+      }));
 
-          const errorMessage = 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'madeUpSubmissionMethod\' submission method' +
+      const errorMessage = 'field \'submissionMethod\' in Submission.measurementSets[0] is invalid: \'madeUpSubmissionMethod\' submission method' +
               ' is not allowed via file upload. registry and electronicHealthRecord are the only allowed submission methods.';
 
-          return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
-              .catch((err) => {
-                  assert.deepEqual(err, {
-                      type: 'ValidationError',
-                      message: 'Measurement set contains a disallowed submission method',
-                      details: [
-                          {
-                              message: errorMessage,
-                              path: '$.measurementSets[0].submissionMethod'
-                          }
-                      ]
-                  });
-              });
-      });
+      return validateSubmission(validSubmissionBadSubmissionMethod, 'JSON', baseOptions)
+        .catch((err) => {
+          assert.deepEqual(err, {
+            type: 'ValidationError',
+            message: 'Measurement set contains a disallowed submission method',
+            details: [
+              {
+                message: errorMessage,
+                path: '$.measurementSets[0].submissionMethod'
+              }
+            ]
+          });
+        });
+    });
 
     it('will use the Submissions API to convert XML to JSON', () => {
       // Don't need to actually send an XML submission here, just making
@@ -274,18 +278,20 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 200', () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
+      sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
         reject(new Error('Could not fetch existing Submissions'));
       }));
 
       return getExistingSubmission(validSubmission, baseOptions)
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Could not fetch existing Submissions');
+          assert.throws(() => {
+            throw err;
+          }, 'Could not fetch existing Submissions');
         });
     });
 
     it('throws an error if there are more than 1 matching submissions', () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
+      sandbox.stub(axios, 'get').returns(new Promise((resolve, reject) => {
         resolve({
           data: {
             data: {
@@ -363,13 +369,15 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 200', () => {
-      const axiosPutStub = sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
+      sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
       }));
 
       return putMeasurementSet(validSubmission, baseOptions, '001')
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Random API Error');
+          assert.throws(() => {
+            throw err;
+          }, 'Random API Error');
         });
     });
 
@@ -398,13 +406,15 @@ describe('fileUploaderUtils', () => {
     });
 
     it('throws an error if the API returns anything other than a 201', () => {
-      const axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+      sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
       }));
 
       return postMeasurementSet(validSubmission, baseOptions, '001')
         .catch((err) => {
-          assert.throws(() => {throw err}, 'Random API Error');
+          assert.throws(() => {
+            throw err;
+          }, 'Random API Error');
         });
     });
 
@@ -412,7 +422,6 @@ describe('fileUploaderUtils', () => {
 
   describe('submitMeasurementSets', () => {
     let axiosPostStub;
-    let axiosPutStub;
     beforeEach(() => {
       axiosPostStub = sandbox.stub(axios, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
@@ -423,7 +432,7 @@ describe('fileUploaderUtils', () => {
           });
         });
       });
-      axiosPutStub = sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
+      sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
           resolve({
             data: {
@@ -476,28 +485,28 @@ describe('fileUploaderUtils', () => {
         }]
       };
 
-      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
+      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.calledTwice(axiosPostStub)
+          sinon.assert.calledTwice(axiosPostStub);
         });
     });
 
     it('will call POST for additional cpcPlus measurement sets', () => {
       const validSubmissionMoreMSets = Object.assign({}, cpcPlusSubmission);
       validSubmissionMoreMSets.measurementSets.push(
-      {
-        category: 'quality',
-        submissionMethod: 'electronicHealthRecord',
-        programName: 'cpcPlus',
-        practiceId: '000123749',
-        performanceStart: '2017-01-01',
-        performanceEnd: '2017-06-01',
-        measurements: [{
-          measureId: 'IA_EPA_4',
-          value: true
-        }]
-      });
+        {
+          category: 'quality',
+          submissionMethod: 'electronicHealthRecord',
+          programName: 'cpcPlus',
+          practiceId: '000123749',
+          performanceStart: '2017-01-01',
+          performanceEnd: '2017-06-01',
+          measurements: [{
+            measureId: 'IA_EPA_4',
+            value: true
+          }]
+        });
 
       const existingSubmission = {
         id: '001',
@@ -525,10 +534,10 @@ describe('fileUploaderUtils', () => {
         }]
       };
 
-      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {});
+      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.called(axiosPostStub)
+          sinon.assert.called(axiosPostStub);
         });
     });
   });

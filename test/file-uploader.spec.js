@@ -1,9 +1,11 @@
+import { describe, it, afterEach } from 'mocha';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import axios from 'axios';
 
 import { fileUploader } from '../file-uploader';
 import { fileUploaderUtil } from '../file-uploader-util';
+import { DUMMY_AUTHORIZATION } from './constants';
 
 const validSubmission = {
   programName: 'mips',
@@ -34,7 +36,7 @@ describe('fileUploader', () => {
     const validateSubmissionStub = sandbox.stub(fileUploaderUtil, 'validateSubmission').callsFake((submission, submissionFormat, baseOptions) => {
       return new Promise((resolve, reject) => {
         throw new Error('Invalid format');
-      });;
+      });
     });
 
     const getExistingSubmissionStub = sandbox.stub(fileUploaderUtil, 'getExistingSubmission').callsFake((submission, baseOptions) => {
@@ -42,13 +44,15 @@ describe('fileUploader', () => {
         resolve({});
       });
     });
-    return fileUploader(JSON.stringify(validSubmission), 'FAKE', 'testJWT', '', (errs, mSets) => {
-        assert.strictEqual(errs.length, 1);
-        assert.strictEqual(mSets.length, 0);
-        sinon.assert.calledOnce(validateSubmissionStub);
-        sinon.assert.notCalled(getExistingSubmissionStub);
+    return fileUploader(JSON.stringify(validSubmission), 'FAKE', { Authorization: DUMMY_AUTHORIZATION }, '', (errs, mSets) => {
+      assert.strictEqual(errs.length, 1);
+      assert.strictEqual(mSets.length, 0);
+      sinon.assert.calledOnce(validateSubmissionStub);
+      sinon.assert.notCalled(getExistingSubmissionStub);
 
-        assert.throws(() => {throw errs[0]}, 'Invalid format');
+      assert.throws(() => {
+        throw errs[0];
+      }, 'Invalid format');
     });
   });
 
@@ -78,19 +82,19 @@ describe('fileUploader', () => {
       return [];
     });
 
-    return fileUploader(JSON.stringify(validSubmission), 'JSON', 'testJWT', '', (errs, mSets) => {
-        assert.strictEqual(errs.length, 0);
-        assert.strictEqual(mSets.length, 1);
-        assert.deepEqual(mSets[0], validSubmission.measurementSets[0]);
+    return fileUploader(JSON.stringify(validSubmission), 'JSON', { Authorization: DUMMY_AUTHORIZATION }, '', (errs, mSets) => {
+      assert.strictEqual(errs.length, 0);
+      assert.strictEqual(mSets.length, 1);
+      assert.deepEqual(mSets[0], validSubmission.measurementSets[0]);
 
-        sinon.assert.calledOnce(validateSubmissionStub);
-        sinon.assert.calledOnce(getExistingSubmissionStub);
+      sinon.assert.calledOnce(validateSubmissionStub);
+      sinon.assert.calledOnce(getExistingSubmissionStub);
 
-        // This was the call before submitMeasurementSets
-        sinon.assert.calledOnce(postMeasurementSetStub);
+      // This was the call before submitMeasurementSets
+      sinon.assert.calledOnce(postMeasurementSetStub);
 
-        sinon.assert.calledOnce(submitMeasurementSetsStub);
-        }); 
+      sinon.assert.calledOnce(submitMeasurementSetsStub);
+    }); 
   });
 
   it('will call the callback with an aggregated error string and any created measurementSets, using POST and PUT appropriately', () => {
@@ -130,7 +134,7 @@ describe('fileUploader', () => {
     };
     validSubmissionMoreMsets.measurementSets.push(measurementSetToCreate);
 
-    const validateSubmissionStub = sandbox.stub(fileUploaderUtil, 'validateSubmission').callsFake((submission, submissionFormat, baseOptions) => {
+    sandbox.stub(fileUploaderUtil, 'validateSubmission').callsFake((submission, submissionFormat, baseOptions) => {
       return new Promise((resolve, reject) => {
         // Need to do a deep copy here because a nested property
         // gets messed with in the code that deals with the resolve
@@ -139,7 +143,7 @@ describe('fileUploader', () => {
       });
     });
 
-    const getExistingSubmissionStub = sandbox.stub(fileUploaderUtil, 'getExistingSubmission').callsFake((submission, baseOptions) => {
+    sandbox.stub(fileUploaderUtil, 'getExistingSubmission').callsFake((submission, baseOptions) => {
       return new Promise((resolve, reject) => {
         resolve(existingSubmission);
       });
@@ -165,12 +169,14 @@ describe('fileUploader', () => {
       });
     });
 
-    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', null, '', (errs, mSets) => {
+    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', { Authorization: DUMMY_AUTHORIZATION }, '', (errs, mSets) => {
       sinon.assert.calledOnce(axiosPostStub);
       sinon.assert.calledOnce(axiosPutStub);
 
       assert.strictEqual(errs.length, 1);
-      assert.throws(() => {throw errs[0]}, 'Random Submissions API error');
+      assert.throws(() => {
+        throw errs[0];
+      }, 'Random Submissions API error');
       assert.strictEqual(mSets.length, 1);
       assert.deepEqual(mSets[0], measurementSetToCreate);
     });
