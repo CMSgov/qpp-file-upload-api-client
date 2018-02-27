@@ -8,7 +8,7 @@ import { fileUploaderUtil } from './file-uploader-util';
  *
  * @param {String} submissionBody
  * @param {String} submissionFormat ('JSON' or 'XML')
- * @param {String} JWT
+ * @param {Object} requestHeaders
  * @param {String} baseSubmissionURL
  * @param {Function} callback
  *
@@ -32,7 +32,7 @@ import { fileUploaderUtil } from './file-uploader-util';
  * }
  *}
  */
-export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissionURL, callback) {
+export function fileUploader(submissionBody, submissionFormat, requestHeaders, baseSubmissionURL, callback) {
   let validatedSubmission;
   let existingSubmission;
   const errs = [];
@@ -40,11 +40,10 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
 
   const baseOptions = {
     url: baseSubmissionURL,
-    headers: {
-      'Authorization': 'Bearer ' + JWT,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
+    headers: Object.assign({
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }, requestHeaders)
   };
 
   return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
@@ -80,7 +79,7 @@ export function fileUploader(submissionBody, submissionFormat, JWT, baseSubmissi
       }
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions, JWT);
+      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions, requestHeaders);
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others
