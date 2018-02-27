@@ -8,7 +8,7 @@ import { fileUploaderUtil } from './file-uploader-util';
  *
  * @param {String} submissionBody
  * @param {String} submissionFormat ('JSON' or 'XML')
- * @param {String} JWT
+ * @param {Object} requestHeaders
  * @param {String} baseSubmissionURL
  * @param {Function} callback
  *
