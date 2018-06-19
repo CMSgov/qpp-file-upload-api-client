@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist",
@@ -36,11 +36,12 @@
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "eslint": "^4.18.1",
-    "mocha": "^3.5.3",
+    "mocha": "^5.0.0",
     "pre-push": "^0.1.1",
     "rimraf": "^2.6.2",
     "sinon": "^4.0.0",
-    "webpack": "^3.7.1"
+    "webpack": "^3.7.1",
+    "snyk": "^1.80.0"
   },
   "pre-push": [
     "test"
