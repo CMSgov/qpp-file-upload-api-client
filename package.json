@@ -10,7 +10,8 @@
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist",
     "lint": "eslint \"**/*.js\"",
-    "pretest": "npm run lint"
+    "pretest": "npm run lint",
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",
