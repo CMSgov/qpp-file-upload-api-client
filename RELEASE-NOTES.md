@@ -1,4 +1,4 @@
 
-## [1.2.16] - 2018-01-12
+## [1.2.20] - 2018-08-04
 ### Added
-- minor changes to the way we publish node package
+- upgraded mocha & eslint
