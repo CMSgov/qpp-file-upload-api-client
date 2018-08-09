@@ -42,7 +42,8 @@
     "rimraf": "^2.6.2",
     "sinon": "^4.0.0",
     "webpack": "^3.7.1",
-    "snyk": "^1.80.0"
+    "snyk": "^1.80.0",
+    "lodash": "^4.17.5"
   },
   "pre-push": [
     "test"
