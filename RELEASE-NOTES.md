@@ -1,4 +1,4 @@
 
-## [1.2.20] - 2018-08-04
+## [1.2.22] - 2018-08-10
 ### Added
-- upgraded mocha & eslint
+- upgraded package dependencies lodash & debug
