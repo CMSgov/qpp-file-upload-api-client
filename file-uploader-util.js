@@ -90,6 +90,10 @@ export function getExistingSubmission(submission, baseOptions) {
     queryParams.entityId = submission.entityId;
   }
 
+  if (submission.performanceYear) {
+    queryParams.performanceYear = submission.performanceYear;
+  }
+
   // Make a string of URL-encoded query parameters
   const queryParamString = Object.keys(queryParams).map((key) => {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
