@@ -1,4 +1,4 @@
 
-## [1.2.22] - 2018-08-10
+## [1.2.23] - 2018-10-19
 ### Added
-- upgraded package dependencies lodash & debug
+- QPPSF-3024 - Add performancYear queryParam to getExistingSubmission
