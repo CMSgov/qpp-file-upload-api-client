@@ -94,6 +94,10 @@ export function getExistingSubmission(submission, baseOptions) {
     queryParams.performanceYear = submission.performanceYear;
   }
 
+  if (submission.entityType) {
+    queryParams.entityType = submission.entityType;
+  }
+
   // Make a string of URL-encoded query parameters
   const queryParamString = Object.keys(queryParams).map((key) => {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
@@ -109,25 +113,20 @@ export function getExistingSubmission(submission, baseOptions) {
     headers: headers
   }).then((body) => {
     const jsonBody = body.data;
-    const existingSubmissions = jsonBody.data.submissions;
+    const totalItems = jsonBody.data.totalItems;
+    const submissions = jsonBody.data.submissions;
 
-    // Look for a submission with the same entityType -- need to do this here because
-    // we can't filter on entityType in our API call to GET /submissions
-    const matchingExistingSubmissions = existingSubmissions.filter((existingSubmission) => {
-      return existingSubmission.entityType === submission.entityType;
-    });
-
-    if (matchingExistingSubmissions.length > 1) {
+    if (totalItems > 1) {
       return Promise.reject(
         createErrorResponse('ValidationError', 'Could not determine which existing Submission matches request')
       );
     }
 
-    if (matchingExistingSubmissions.length === 0) {
+    if (totalItems === 0) {
       return;
     }
 
-    return matchingExistingSubmissions[0];
+    return submissions[0];
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
@@ -189,6 +188,7 @@ export function postMeasurementSet(measurementSet, baseOptions) {
  */
 export function submitMeasurementSets(existingSubmission, submission, baseOptions, requestHeaders) {
   const encodedToken = requestHeaders && requestHeaders.Authorization && requestHeaders.Authorization.split(' ')[1];
+  const orgId = requestHeaders && requestHeaders['organization-id'];
   const token = jwtDecode.default(encodedToken);
   const organizations = (token && token.data && token.data.organizations) || [];
   const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
@@ -214,12 +214,11 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     }
 
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
-
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
       return (
         (
           (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
-            (isRegistryUser && organizations.some(org => org.id === existingMeasurementSet.submitterId))
+          (isRegistryUser && orgId === existingMeasurementSet.submitterId)
         ) &&
             (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&

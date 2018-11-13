@@ -269,7 +269,7 @@ describe('fileUploaderUtils', () => {
       return getExistingSubmission(validSubmission, baseOptions)
         .then((returnedSubmission) => {
           sinon.assert.calledOnce(axiosGetStub);
-          assert.strictEqual(axiosGetStub.firstCall.args[0], `/submissions?nationalProviderIdentifier=${validSubmission.nationalProviderIdentifier}&performanceYear=${validSubmission.performanceYear}`);
+          assert.strictEqual(axiosGetStub.firstCall.args[0], `/submissions?nationalProviderIdentifier=${validSubmission.nationalProviderIdentifier}&performanceYear=${validSubmission.performanceYear}&entityType=${validSubmission.entityType}`);
 
           assert.exists(returnedSubmission);
           assert.strictEqual(returnedSubmission.id, '001');
@@ -337,7 +337,7 @@ describe('fileUploaderUtils', () => {
       return getExistingSubmission(validSubmission, baseOptions)
         .then((returnedSubmission) => {
           sinon.assert.calledOnce(axiosGetStub);
-          assert.strictEqual(axiosGetStub.firstCall.args[0], `/submissions?nationalProviderIdentifier=${validSubmission.nationalProviderIdentifier}&performanceYear=${validSubmission.performanceYear}`);
+          assert.strictEqual(axiosGetStub.firstCall.args[0], `/submissions?nationalProviderIdentifier=${validSubmission.nationalProviderIdentifier}&performanceYear=${validSubmission.performanceYear}&entityType=${validSubmission.entityType}`);
 
           assert.exists(returnedSubmission);
           assert.strictEqual(returnedSubmission.entityId, '123456');
