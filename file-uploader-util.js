@@ -99,9 +99,11 @@ export function getExistingSubmission(submission, baseOptions) {
     return `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`;
   }).join('&');
 
-  const headers = Object.assign({}, baseOptions.headers, {
-    'qpp-taxpayer-identification-number': submission.taxpayerIdentificationNumber
-  });
+  const headers = Object.assign({}, baseOptions.headers);
+  
+  if (submission.taxpayerIdentificationNumber) {
+    headers['qpp-taxpayer-identification-number'] = submission.taxpayerIdentificationNumber;
+  }
 
   return axios.get(baseOptions.url + '/submissions?' + queryParamString, {
     headers: headers
@@ -205,7 +207,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
         programName: submission.programName,
         entityType: submission.entityType,
         entityId: submission.entityId || null,
-        taxpayerIdentificationNumber: submission.taxpayerIdentificationNumber,
+        taxpayerIdentificationNumber: submission.taxpayerIdentificationNumber || null,
         nationalProviderIdentifier: submission.nationalProviderIdentifier || null,
         performanceYear: submission.performanceYear
       }});
