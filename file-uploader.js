@@ -63,7 +63,7 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
           programName: validatedSubmission.programName,
           entityType: validatedSubmission.entityType,
           entityId: validatedSubmission.entityId || null,
-          taxpayerIdentificationNumber: validatedSubmission.taxpayerIdentificationNumber,
+          taxpayerIdentificationNumber: validatedSubmission.taxpayerIdentificationNumber || null,
           nationalProviderIdentifier: validatedSubmission.nationalProviderIdentifier || null,
           performanceYear: validatedSubmission.performanceYear
         }});
