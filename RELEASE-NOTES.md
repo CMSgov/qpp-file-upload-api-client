@@ -1,4 +1,4 @@
 
-## [1.2.23] - 2018-10-19
+## [1.2.24] - 2018-11-13
 ### Added
-- QPPSF-3024 - Add performancYear queryParam to getExistingSubmission
+- QPPSF-2382 - Add logic for Virtual Groups
