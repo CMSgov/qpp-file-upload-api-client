@@ -1,11 +1,12 @@
 {
   "name": "qpp-file-upload-api-client",
-  "version": "1.2.24",
+  "version": "1.2.25",
   "description": "An npm package to send the necessary requests to the Submissions API to execute the functionality required by a file upload client",
   "main": "./dist/index.js",
   "types": "index.d.ts",
   "scripts": {
     "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "dev": "npm run clean && webpack --progress --colors --watch --env.production=false",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist",
@@ -27,8 +28,7 @@
   },
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
-    "axios": "^0.16.2",
-    "jwt-decode": "^2.2.0"
+    "axios": "^0.16.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

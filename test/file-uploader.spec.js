@@ -169,16 +169,25 @@ describe('fileUploader', () => {
       });
     });
 
-    return fileUploader(JSON.stringify(validSubmissionMoreMsets), 'JSON', { Authorization: DUMMY_AUTHORIZATION }, '', (errs, mSets) => {
-      sinon.assert.calledOnce(axiosPostStub);
-      sinon.assert.calledOnce(axiosPutStub);
+    return fileUploader(
+      JSON.stringify(validSubmissionMoreMsets),
+      'JSON',
+      {
+        Authorization: DUMMY_AUTHORIZATION,
+        'organization-id': 'individual'
+      },
+      '',
+      (errs, mSets) => {
+        sinon.assert.calledOnce(axiosPostStub);
+        sinon.assert.calledOnce(axiosPutStub);
 
-      assert.strictEqual(errs.length, 1);
-      assert.throws(() => {
-        throw errs[0];
-      }, 'Random Submissions API error');
-      assert.strictEqual(mSets.length, 1);
-      assert.deepEqual(mSets[0], measurementSetToCreate);
-    });
+        assert.strictEqual(errs.length, 1);
+        assert.throws(() => {
+          throw errs[0];
+        }, 'Random Submissions API error');
+        assert.strictEqual(mSets.length, 1);
+        assert.deepEqual(mSets[0], measurementSetToCreate);
+      }
+    );
   });
 });
