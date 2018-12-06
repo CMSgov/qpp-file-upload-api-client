@@ -1,4 +1,4 @@
 
-## [1.2.24] - 2018-11-13
+## [1.2.25] - 2018-12-06
 ### Added
-- QPPSF-2382 - Add logic for Virtual Groups
+- QPPSF-3586 - Fix upload bug.
