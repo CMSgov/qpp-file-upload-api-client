@@ -6,6 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "dev": "npm run clean && webpack --progress --colors --watch --env.production=false",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
     "clean": "rimraf dist",

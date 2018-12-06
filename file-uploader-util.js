@@ -187,12 +187,10 @@ export function postMeasurementSet(measurementSet, baseOptions) {
  * @return {Array<Promise>}
  */
 export function submitMeasurementSets(existingSubmission, submission, baseOptions, requestHeaders) {
-  const encodedToken = requestHeaders && requestHeaders.Authorization && requestHeaders.Authorization.split(' ')[1];
   const orgId = requestHeaders && requestHeaders['organization-id'];
-  const token = jwtDecode.default(encodedToken);
-  const organizations = (token && token.data && token.data.organizations) || [];
-  const isRegistryUser = organizations.some(org => org.orgType === 'registry' || org.orgType === 'qcdr');
+  const isRegistryUser = orgId !== 'individual';
   const promises = [];
+
   submission.measurementSets.forEach((measurementSet) => {
     let measurementSetToSubmit;
     let existingMeasurementSets = [];
