@@ -422,6 +422,7 @@ describe('fileUploaderUtils', () => {
 
   describe('submitMeasurementSets', () => {
     let axiosPostStub;
+    let axiosPutStub;
     beforeEach(() => {
       axiosPostStub = sandbox.stub(axios, 'post').callsFake((mSet, options) => {
         return new Promise((resolve, reject) => {
@@ -432,7 +433,7 @@ describe('fileUploaderUtils', () => {
           });
         });
       });
-      sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
+      axiosPutStub = sandbox.stub(axios, 'put').callsFake((mSet, options, mSetId) => {
         return new Promise((resolve, reject) => {
           resolve({
             data: {
@@ -488,7 +489,8 @@ describe('fileUploaderUtils', () => {
       const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.calledTwice(axiosPostStub);
+          sinon.assert.calledOnce(axiosPostStub);
+          sinon.assert.calledOnce(axiosPutStub);
         });
     });
 
