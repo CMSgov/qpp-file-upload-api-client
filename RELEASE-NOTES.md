@@ -1,4 +1,4 @@
 
-## [1.2.25] - 2018-12-06
+## [1.3.0] - 2019-02-13
 ### Added
-- QPPSF-3586 - Fix upload bug.
+- QPPSF-3983 - Low Security Alert Fix.
