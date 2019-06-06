@@ -1,4 +1,4 @@
 
-## [1.2.25] - 2018-12-06
+## [1.3.1] - 2019-06-06
 ### Added
-- QPPSF-3586 - Fix upload bug.
+- QPPSF-4653 - Fixed Vulnerability Issues with Lodash and Axios
