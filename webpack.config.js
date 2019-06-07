@@ -1,16 +1,18 @@
 const path = require('path');
 const webpack = require('webpack');
-
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const packageJson = require('./package.json');
 
 const entry = ['./index.js'];
 
 const _module = {
-  rules: [{
-    test: /\.(js)?$/,
-    loader: 'babel-loader',
-    exclude: /node_modules/
-  }]
+  rules: [
+    {
+      test: /\.(js|jsx)$/,
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    }
+  ]
 };
 
 const plugins = [
@@ -20,7 +22,7 @@ const plugins = [
     },
     buildVersion: JSON.stringify(packageJson.version)
   }),
-  new webpack.optimize.UglifyJsPlugin(),
+  new UglifyJSPlugin()
 ];
 
 const resolve = {
@@ -28,7 +30,6 @@ const resolve = {
 };
 
 const defaultConfig = (env, argv) => {
-    
   return ({
     target: 'node',
     entry,
@@ -47,7 +48,6 @@ const defaultConfig = (env, argv) => {
 
 
 const browserConfig = (env, argv) => {
-
   return ({
     target: 'web',
     entry,
