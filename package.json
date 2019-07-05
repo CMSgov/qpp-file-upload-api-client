@@ -13,7 +13,8 @@
     "lint": "eslint \"**/*.js\"",
     "pretest": "npm run lint",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "wizard": "snyk wizard"
   },
   "repository": {
     "type": "git",
