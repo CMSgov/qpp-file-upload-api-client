@@ -1,4 +1,4 @@
 
-## [1.3.1] - 2019-06-06
+## [1.3.3] - 2019-07-08
 ### Added
-- QPPSF-4653 - Fixed Vulnerability Issues with Lodash and Axios
+- QPPSF-4835 - Added synk wizard npm command, and added patch for vulnerabilities
