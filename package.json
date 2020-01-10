@@ -47,7 +47,8 @@
     "rimraf": "^2.6.2",
     "sinon": "^7.2.3",
     "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.41.5"
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "pre-push": [
     "test"
