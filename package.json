@@ -31,7 +31,7 @@
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
     "axios": "^0.19.0",
-    "snyk": "^1.173.1"
+    "snyk": "^1.278.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
@@ -41,13 +41,13 @@
     "chai": "^4.1.2",
     "debug": "^2.6.9",
     "eslint": "^4.19.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "mocha": "5.2.0",
     "pre-push": "^0.1.1",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.3",
-    "uglifyjs-webpack-plugin": "^1.1.5",
-    "webpack": "^3.7.1"
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.5"
   },
   "pre-push": [
     "test"
