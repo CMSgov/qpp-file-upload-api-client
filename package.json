@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "coverage": "nyc mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "coverage": "nyc --reporter=html mocha --require babel-register --recursive ./test/**/*.spec.js",
     "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
     "dev": "npm run clean && webpack --progress --colors --watch --env.production=false",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
