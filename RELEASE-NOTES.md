@@ -1,4 +1,5 @@
 
-## [1.3.1] - 2019-06-06
+## [1.3.4] - 2020-02-02
 ### Added
-- QPPSF-4653 - Fixed Vulnerability Issues with Lodash and Axios
+- https://jira.cms.gov/browse/QPPSF-5596 - Allow Negative Proportion Measures
+- Vulnerability Fixes
