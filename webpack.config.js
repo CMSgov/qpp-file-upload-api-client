@@ -40,6 +40,7 @@ const defaultConfig = (env, argv) => {
       path: path.resolve(__dirname, 'dist')
     },
     devtool: env && env.production == 'true' ? 'source-map' : 'eval-source-map',
+    mode: env && env.production === 'true' ? 'production' : 'development',
     module: _module, // module is already defined
     plugins,
     resolve
@@ -59,6 +60,7 @@ const browserConfig = (env, argv) => {
     },
     devtool: env && env.production == 'true' ? 'source-map' : 'eval-source-map',
     module: _module, // module is already defined
+    mode: env && env.production === 'true' ? 'production' : 'development',
     plugins,
     resolve
   });

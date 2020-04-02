@@ -13,7 +13,7 @@ import { fileUploaderUtil } from './file-uploader-util';
  * @param {Function} callback
  *
  * @return {Promise}
- * 
+ *
  * Note: Error Format
  * {
  * "error": {
@@ -47,8 +47,11 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
   };
 
   return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
-    .then((validSubmission) => {
-      validatedSubmission = validSubmission;
+    .then((_validSubmission) => {
+      // QPPSF-5596, part of the validation logic for NonProportion measures for PY 2019, is to add a new field during validation,
+      // to prevent additional fields being added, we are going to send the original submission object
+      // to the api since the validation adds some validation properties
+      validatedSubmission = JSON.parse(submissionBody);
       return fileUploaderUtil.getExistingSubmission(validatedSubmission, baseOptions);
     }).then((existingSubmissionReturned) => {
       existingSubmission = existingSubmissionReturned;
