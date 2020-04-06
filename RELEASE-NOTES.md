@@ -1,3 +1,4 @@
-## [1.3.5] - 2020-02-02
+
+## [1.3.6] - 2020-02-06
 ### Added
-- Bug Fixes
+- Minor updates to deployment sequence
