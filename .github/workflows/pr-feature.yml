@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Run Tests
-        run: npm coverage
+        run: npm run coverage
 
       - name: Produce Coverage report
         uses: 5monkeys/cobertura-action@882bd919c67f7aa665370064c22fb81e7662a759 # pin@master
