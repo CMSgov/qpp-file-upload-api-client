@@ -22,4 +22,14 @@ jobs:
         run: npm ci
 
       - name: Run Tests
-        run: npm test
+        run: npm coverage
+
+      - name: Produce Coverage report
+        uses: 5monkeys/cobertura-action@882bd919c67f7aa665370064c22fb81e7662a759 # pin@master
+        with:
+          path: coverage/cobertura-coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          only_changed_files: false
+          show_line: true
+          show_branch: true
+          minimum_coverage: 90
