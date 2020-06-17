@@ -32,4 +32,4 @@ jobs:
           only_changed_files: false
           show_line: true
           show_branch: true
-          minimum_coverage: 90
+          minimum_coverage: 80
