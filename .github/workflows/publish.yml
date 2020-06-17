@@ -26,8 +26,11 @@ jobs:
           node-version: 10.14.2
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Clean
+        run: npm run clean
+
+      - name: Do production build
+        run: npm run build:prod
 
       - name: Publish to NPMJS
         run: npm publish
