@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "types": "index.d.ts",
   "scripts": {
+    "coverage": "nyc --reporter=cobertura  --reporter=html mocha --require babel-register --recursive ./test/**/*.spec.js",
     "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
     "dev": "npm run clean && webpack --progress --colors --watch --env.production=false",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
@@ -43,6 +44,7 @@
     "eslint": "^4.19.1",
     "lodash": "^4.17.15",
     "mocha": "5.2.0",
+    "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.3",
