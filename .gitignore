@@ -2,6 +2,7 @@ node_modules/*
 *.swp
 .idea
 dist
-.nyc_output
-coverage
-.ds_store
+
+.DS_Store
+.nyc_output/
+coverage/
