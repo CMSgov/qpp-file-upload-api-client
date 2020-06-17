@@ -1,0 +1,35 @@
+name: PR CI/Checks
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ develop ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+
+      - name: Configure Node version and registry
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run coverage
+
+      - name: Produce Coverage report
+        uses: 5monkeys/cobertura-action@882bd919c67f7aa665370064c22fb81e7662a759 # pin@master
+        with:
+          path: coverage/cobertura-coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          only_changed_files: false
+          show_line: true
+          show_branch: true
+          minimum_coverage: 80

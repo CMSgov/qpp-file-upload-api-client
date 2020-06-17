@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "coverage": "nyc --reporter=cobertura  --reporter=html mocha --require babel-register --recursive ./test/**/*.spec.js",
-    "test": "snyk test && mocha --require babel-register --recursive ./test/**/*.spec.js",
+    "test": "mocha --require babel-register --recursive ./test/**/*.spec.js",
     "dev": "npm run clean && webpack --progress --colors --watch --env.production=false",
     "build:dev": "npm run clean && webpack --progress --colors --env.production=false",
     "build:prod": "npm run clean && webpack --progress --colors --env.production=true",
@@ -14,6 +14,7 @@
     "lint": "eslint \"**/*.js\"",
     "pretest": "npm run lint",
     "snyk-protect": "snyk protect",
+    "snyk-test": "snyk test",
     "prepare": "npm run snyk-protect",
     "wizard": "snyk wizard"
   },
@@ -32,7 +33,7 @@
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
     "axios": "^0.19.0",
-    "snyk": "^1.321.0"
+    "snyk": "^1.290.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
