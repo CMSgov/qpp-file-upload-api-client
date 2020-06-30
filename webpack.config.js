@@ -20,7 +20,7 @@ const plugins = [
     'process.env': {
       NODE_ENV: JSON.stringify('production')
     },
-    buildVersion: packageJson.version
+    buildVersion: JSON.stringify(packageJson.version)
   }),
   new TerserPlugin()
 ];
