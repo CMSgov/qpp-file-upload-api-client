@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const packageJson = require('./package.json');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const entry = ['./index.js'];
 
@@ -22,7 +22,7 @@ const plugins = [
     },
     buildVersion: JSON.stringify(packageJson.version)
   }),
-  new UglifyJSPlugin()
+  new TerserPlugin()
 ];
 
 const resolve = {
@@ -66,4 +66,4 @@ const browserConfig = (env, argv) => {
   });
 };
 
-module.exports = [defaultConfig, browserConfig];
+module.exports = [ defaultConfig, browserConfig ];
