@@ -7,16 +7,15 @@ name: Release
 
 on:
   release:
-    types: [ prereleased ]
+    types: [ publish ]
 
 jobs:
 
   # Will publish the node package to NPM packages
   publish-npm:
     runs-on: ubuntu-latest
-#    needs: publish-npm
-    steps:
 
+    steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
 
