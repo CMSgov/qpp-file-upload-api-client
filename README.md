@@ -107,7 +107,7 @@ git checkout -b release/x.x.x
 2. Update the `package.json` and `package-lock.json` with the latest release version.
 3. Open PRs into develop and master from the release branch.
 4. Delete the release branch once the PRs have been merged.
-5. When you're ready to push the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases) . Open up the draft release, modify description (optional) and select **publish**  to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions). 
+5. When you're ready to push the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases) . Open up the draft release, modify description (optional) and select **This is a pre-release** then **update release** to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions). 
 
 ### Release Troubleshooting
 
