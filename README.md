@@ -91,10 +91,11 @@ The **develop** branch is considered to be the main branch where the source code
 
 ```
 git checkout develop
-git checkout -b feature/x.x.x
+git checkout -b feature/qppsf-xxxx-
 ```
 
-2. When you're finished with the feature branch open a PR into the develop branch and merge.
+2. When development is complete on feature branch open a PR into the develop branch and merge.
+3. At this stage we should not change the version number.
 
 **Staging** 
 
@@ -106,8 +107,8 @@ git checkout -b release/x.x.x-beta
 ```
 
 2. Update the `package.json` and `package-lock.json` with the latest release version.
-
-3. When you're ready to push the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases) . Open up the draft release, modify description (optional) and select **publish release** to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions).
+3. Draft release will be created as part of the GitHub Actions here -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases)
+4. When you're ready to publish the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases). Open up the draft release, modify description (optional) and select **publish release** to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions).
 
 **Production**
 
