@@ -96,8 +96,22 @@ git checkout -b feature/x.x.x
 
 2. When you're finished with the feature branch open a PR into the develop branch and merge.
 
+**Staging** 
+
+1. Create a new release branch from the develop branch. 
+
+```
+git checkout develop
+git checkout -b release/x.x.x-beta
+```
+
+2. Update the `package.json` and `package-lock.json` with the latest release version.
+
+3. When you're ready to push the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases) . Open up the draft release, modify description (optional) and select **publish release** to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions).
+
 **Production**
-1. Create a new release branch from develop. Check the `package.json` or [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases) for the latest release. 
+
+1. Create a new release branch from the develop branch. 
 
 ```
 git checkout develop
