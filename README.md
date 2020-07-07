@@ -101,6 +101,8 @@ git checkout -b feature/qppsf-xxxx-
 
 ***Purpose of this step is to create a beta npm package for testing***
 
+***Do NOT create a PR from this branch***
+
 1. Create a new release branch from the develop branch.
 2. Draft release will be created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases).
 
@@ -112,6 +114,8 @@ git checkout -b release/x.x.x-beta
 
 3. Update the `package.json` and `package-lock.json` with the latest release version.  Should match the release version.
 4. When you're ready to publish the library to NPM modify the draft release created by the CI/CD pipeline -> [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases). Open up the draft release (this is a ***manual*** step), modify description (optional) and select **publish release** to publish the release and push to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions).
+
+***If an issue is discovered during the testing, please start again with a feature branch***
 
 **Production**
 
