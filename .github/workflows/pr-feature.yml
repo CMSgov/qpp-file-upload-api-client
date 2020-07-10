@@ -1,9 +1,11 @@
 name: PR CI/Checks
 on:
-  pull_request:
-    types: [opened, synchronize]
-    branches: [ develop ]
+  push:
+    branches: [ master, develop ]
 
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ develop ]
 
 jobs:
   build:
