@@ -1,4 +1,4 @@
-name: Deploy package to NPM 
+name: Deploy to NPM Registry
 
 on:
   release:
