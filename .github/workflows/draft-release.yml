@@ -4,7 +4,7 @@ on: create
 
 jobs:
   release_draft:
-    if: ${{ contains(github.ref, 'refs/heads/release/') }}
+    if: github.ref == 'refs/heads/releases/'
     runs-on: ubuntu-latest
     steps:
 
