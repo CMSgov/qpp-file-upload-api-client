@@ -49,7 +49,7 @@ const defaultConfig = (env, argv) => {
 
 
 const browserConfig = (env, argv) => {
-    // Checking string 'true' worked in webpack v4, v5 seems to use a boolean. Checking both to be safe
+  // Checking string 'true' worked in webpack v4, v5 seems to use a boolean. Checking both to be safe
   const isProdBuild = env && (env.production === true || env.production === 'true');
   return ({
     target: 'web',
