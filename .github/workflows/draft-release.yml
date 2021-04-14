@@ -1,10 +1,12 @@
 name: Release Notes Drafter
 
 on: create
+  branches:
+    # Create events to branches matching refs/heads/release/**
+    - 'release/**'
 
 jobs:
   release_draft:
-    if: github.ref == 'refs/heads/releases/'
     runs-on: ubuntu-latest
     steps:
 
