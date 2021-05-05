@@ -34,7 +34,6 @@ const defaultConfig = (env, argv) => {
     target: 'node',
     entry,
     output: {
-      library: 'QppFileUploadClient',
       libraryTarget: 'commonjs2',
       filename: 'node.js',
       path: path.resolve(__dirname, 'dist')
@@ -56,7 +55,6 @@ const browserConfig = (env, argv) => {
     entry,
     output: {
       libraryTarget: 'commonjs2',
-      library: 'QppFileUploadClient',
       filename: 'index.js',
       path: path.resolve(__dirname, 'dist')
     },
