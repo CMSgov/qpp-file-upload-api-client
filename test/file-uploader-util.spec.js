@@ -59,7 +59,7 @@ const cpcPlusSubmission = {
 };
 
 describe('fileUploaderUtils', () => {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   afterEach(() => {
     sandbox.restore();
@@ -262,7 +262,7 @@ describe('fileUploaderUtils', () => {
             data: {
               submissions: [Object.assign({}, validSubmission, {id: '001'})]
             }
-          } 
+          }
         });
       }));
 
