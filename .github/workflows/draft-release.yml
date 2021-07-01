@@ -4,7 +4,7 @@ on: create
 
 jobs:
   release_draft:
-    if: contains(github.ref, "release")
+    if: contains(github.ref, 'release')
     runs-on: ubuntu-latest
     steps:
 
