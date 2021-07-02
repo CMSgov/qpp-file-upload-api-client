@@ -26,7 +26,7 @@ const validSubmission = {
 };
 
 describe('fileUploader', () => {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   afterEach(() => {
     sandbox.restore();
@@ -75,7 +75,7 @@ describe('fileUploader', () => {
     const postMeasurementSetStub = sandbox.stub(fileUploaderUtil, 'postMeasurementSet').callsFake((measurementSet, options) => {
       return new Promise((resolve, reject) => {
         resolve(validSubmission.measurementSets[0]);
-      }); 
+      });
     });
 
     const submitMeasurementSetsStub = sandbox.stub(fileUploaderUtil, 'submitMeasurementSets').callsFake((existingSubmission, submission, mSetsToCreate, options) => {
@@ -94,7 +94,7 @@ describe('fileUploader', () => {
       sinon.assert.calledOnce(postMeasurementSetStub);
 
       sinon.assert.calledOnce(submitMeasurementSetsStub);
-    }); 
+    });
   });
 
   it('will call the callback with an aggregated error string and any created measurementSets, using POST and PUT appropriately', () => {
