@@ -213,6 +213,9 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     const defaultProgramName = 'mips';
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId + programName
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
+      const existingProgramName = existingMeasurementSet.programName ? existingMeasurementSet.programName : defaultProgramName;
+      const submittedProgramName = measurementSet.programName ? measurementSet.programName : defaultProgramName;
+
       return (
         (
           (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
@@ -221,7 +224,7 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
             (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&
             (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true) &&
-            (existingMeasurementSet.programName ? existingMeasurementSet.programName : defaultProgramName) === (measurementSet.programName ? measurementSet.programName : defaultProgramName)
+            (existingProgramName === submittedProgramName)
       );
     });
 

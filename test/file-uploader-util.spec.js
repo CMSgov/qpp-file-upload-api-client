@@ -611,5 +611,39 @@ describe('fileUploaderUtils', () => {
           sinon.assert.calledOnce(axiosPostStub);
         });
     });
+
+    it('will call PUT for existing measurement sets compared by category + submissionMethod + cpcPlus practiceId + programName, default programName of mips used', () => {
+      let originalSubmission = cpcPlusSubmission;
+
+      originalSubmission.measurementSets.forEach(mset => {
+        mset.programName = '';
+      });
+
+      const validSubmissionMoreMSets = JSON.parse(JSON.stringify(originalSubmission));
+
+      const existingSubmission = {
+        entityType: 'individual',
+        taxpayerIdentificationNumber: '000123456',
+        nationalProviderIdentifier: '0123456789',
+        performanceYear: 2017,
+        measurementSets: [{
+          category: 'quality',
+          practiceId: '000123458',
+          submissionMethod: 'registry',
+          performanceStart: '2017-01-01',
+          performanceEnd: '2017-06-01',
+          measurements: [{
+            measureId: 'IA_EPA_4',
+            value: true
+          }]
+        }]
+      };
+
+      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
+      return Promise.all(promiseArray)
+        .then((promiseOutputs) => {
+          sinon.assert.calledOnce(axiosPutStub);
+        });
+    });
   });
 });
