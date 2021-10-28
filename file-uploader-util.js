@@ -210,8 +210,12 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
       }});
     }
 
-    // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId
+    const defaultProgramName = 'mips';
+    const submittedProgramName = measurementSet.programName ? measurementSet.programName : defaultProgramName;
+    // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId + programName
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
+      const existingProgramName = existingMeasurementSet.programName ? existingMeasurementSet.programName : defaultProgramName;
+
       return (
         (
           (!isRegistryUser && existingMeasurementSet.submitterId === 'securityOfficial') ||
@@ -219,7 +223,8 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
         ) &&
             (existingMeasurementSet.submissionMethod === measurementSet.submissionMethod) &&
             (existingMeasurementSet.category === measurementSet.category) &&
-            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true)
+            (!!existingMeasurementSet.practiceId || !!measurementSet.practiceId ? existingMeasurementSet.practiceId === measurementSet.practiceId : true) &&
+            (existingProgramName === submittedProgramName)
       );
     });
 
