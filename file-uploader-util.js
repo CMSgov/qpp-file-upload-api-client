@@ -211,10 +211,10 @@ export function submitMeasurementSets(existingSubmission, submission, baseOption
     }
 
     const defaultProgramName = 'mips';
+    const submittedProgramName = measurementSet.programName ? measurementSet.programName : defaultProgramName;
     // Look for existing measurementSets with the same category + submissionMethod + cpcPlus practiceId + programName
     const matchingMeasurementSets = existingMeasurementSets.filter((existingMeasurementSet) => {
       const existingProgramName = existingMeasurementSet.programName ? existingMeasurementSet.programName : defaultProgramName;
-      const submittedProgramName = measurementSet.programName ? measurementSet.programName : defaultProgramName;
 
       return (
         (
