@@ -2,12 +2,12 @@ name: Deploy to NPM Registry
 
 on:
   release:
-    types: [ released ]
+    types: [ prereleased ]
 
 jobs:
 
   publish-npm:
-    name: Build library and deploy to NPM registry
+    name: Build library and deploy to NPM registry as a beta release
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +29,7 @@ jobs:
       - name: Do production build
         run: npm run build:prod
 
-      - name: Publish to NPMJS
-        run: npm publish
+      - name: Publish beta version to NPMJS
+        run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
