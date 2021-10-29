@@ -1,4 +1,4 @@
-name: Deploy to NPM Registry
+name: Deploy Beta version to NPM Registry
 
 on:
   release:
