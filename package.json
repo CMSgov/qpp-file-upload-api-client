@@ -16,8 +16,7 @@
     "snyk-protect": "snyk protect",
     "snyk-test": "snyk test",
     "prepare": "npm run snyk-protect",
-    "wizard": "snyk wizard",
-    "version": "echo $npm_package_version"
+    "wizard": "snyk wizard"
   },
   "repository": {
     "type": "git",
