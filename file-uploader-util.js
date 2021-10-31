@@ -162,7 +162,7 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
  * @return {Object}
  */
 export function postMeasurementSet(measurementSet, baseOptions) {
-  return axios.post(baseOptions.url + '/measurement-sets', JSON.stringify(measurementSet), {
+  return axios.post(baseOptions.url + '/measurement-sets', measurementSet, {
     headers: baseOptions.headers
   }).then((body) => {
     // Assuming a 201 response here
