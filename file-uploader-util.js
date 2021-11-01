@@ -142,7 +142,7 @@ export function getExistingSubmission(submission, baseOptions) {
  * @return {Object}
  */
 export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
-  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, JSON.stringify(measurementSet), {
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, measurementSet, {
     headers:baseOptions.headers
   }).then((body) => {
     // Assuming a 200 response here
