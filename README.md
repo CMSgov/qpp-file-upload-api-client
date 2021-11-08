@@ -14,7 +14,7 @@ The `fileUploader()` function exported by this module uses the following set of 
 
 ## Arguments
 
-1.`submissionBody`: A string containing the QPP JSON or QPP XML Submission body. See the [Submissions API Developer Documentation](cmsgov.github.io/qpp-submissions-docs) for more information on schemas, but you can use this example payload to use with the `fileUploader()` function: [example payload](https://gist.github.com/samskeller/0eeb89ead1ddb189236593e2a9aa1034)
+1.`submissionBody`: A string containing the QPP JSON or QPP XML Submission body. See the [Submissions API Developer Documentation](cmsgov.github.io/qpp-submissions-docs) for more information on schemas
 
 2.`submissionFormat`: A string specifying the format -- only "JSON" and "XML" are supported
 
