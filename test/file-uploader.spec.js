@@ -151,7 +151,7 @@ describe('fileUploader', () => {
 
     const axiosPostStub = sandbox.stub(axios, 'post').callsFake((url, data) => {
       return new Promise((resolve, reject) => {
-        const measurementSetBody = JSON.parse(JSON.stringify(data));
+        const measurementSetBody = JSON.parse(data);
         const responseBody = {
           data: {
             data: {

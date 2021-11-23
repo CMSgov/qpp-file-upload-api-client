@@ -1,7 +1,6 @@
 name: Release Notes Drafter
 
-on: 
-  create
+on: create
 
 jobs:
   release_draft:

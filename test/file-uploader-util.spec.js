@@ -495,7 +495,7 @@ describe('fileUploaderUtils', () => {
     });
 
     it('will call POST for additional cpcPlus measurement sets', () => {
-      const validSubmissionMoreMSets = JSON.parse(JSON.stringify(cpcPlusSubmission));
+      const validSubmissionMoreMSets = Object.assign({}, cpcPlusSubmission);
       validSubmissionMoreMSets.measurementSets.push(
         {
           category: 'quality',
@@ -539,110 +539,7 @@ describe('fileUploaderUtils', () => {
       const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
       return Promise.all(promiseArray)
         .then((promiseOutputs) => {
-          sinon.assert.calledTwice(axiosPostStub);
-        });
-    });
-
-    it('will call PUT for existing measurement sets compared by category + submissionMethod + cpcPlus practiceId + programName', () => {
-      const validSubmissionMoreMSets = JSON.parse(JSON.stringify(cpcPlusSubmission));
-      validSubmissionMoreMSets.measurementSets.push(
-        {
-          category: 'quality',
-          submissionMethod: 'registry',
-          programName: 'cpcPlus',
-          practiceId: '000123749',
-          performanceStart: '2017-01-01',
-          performanceEnd: '2017-06-01',
-          measurements: [{
-            measureId: 'IA_EPA_4',
-            value: true
-          }]
-        });
-
-      const existingSubmission = {
-        id: '001',
-        measurementSets: [{
-          category: 'quality',
-          submissionMethod: 'registry',
-          practiceId: '000123749',
-          programName: 'cpcPlus',
-          performanceStart: '2017-01-01',
-          performanceEnd: '2017-06-01',
-          measurements: [{
-            measureId: 'IA_EPA_4',
-            value: true
-          }]
-        }]
-      };
-
-      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
-      return Promise.all(promiseArray)
-        .then((promiseOutputs) => {
-          sinon.assert.calledOnce(axiosPutStub);
-        });
-    });
-
-    it('will call POST for non-existing measurement sets compared by category + submissionMethod + cpcPlus practiceId + programName, different programName', () => {
-      const validSubmissionMoreMSets = JSON.parse(JSON.stringify(cpcPlusSubmission));
-
-      const existingSubmission = {
-        programName: 'mips',
-        entityType: 'individual',
-        taxpayerIdentificationNumber: '000123456',
-        nationalProviderIdentifier: '0123456789',
-        performanceYear: 2017,
-        measurementSets: [{
-          category: 'quality',
-          programName: 'mips',
-          practiceId: '000123458',
-          submissionMethod: 'registry',
-          performanceStart: '2017-01-01',
-          performanceEnd: '2017-06-01',
-          measurements: [{
-            measureId: 'IA_EPA_4',
-            value: true
-          }]
-        }]
-      };
-
-      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
-      return Promise.all(promiseArray)
-        .then((promiseOutputs) => {
-          sinon.assert.calledOnce(axiosPostStub);
-        });
-    });
-
-    it('will call PUT for existing measurement sets compared by category + submissionMethod + cpcPlus practiceId + programName, default programName of mips used', () => {
-      let originalSubmission = cpcPlusSubmission;
-
-      originalSubmission.measurementSets.forEach(mset => {
-        mset.programName = '';
-      });
-
-      const validSubmissionMoreMSets = JSON.parse(JSON.stringify(originalSubmission));
-
-      const existingSubmission = {
-        entityType: 'individual',
-        taxpayerIdentificationNumber: '000123456',
-        nationalProviderIdentifier: '0123456789',
-        performanceYear: 2017,
-        measurementSets: [{
-          category: 'quality',
-          practiceId: '000123458',
-          submissionMethod: 'registry',
-          performanceStart: '2017-01-01',
-          performanceEnd: '2017-06-01',
-          measurements: [{
-            measureId: 'IA_EPA_4',
-            value: true
-          }]
-        }]
-      };
-
-      const promiseArray = submitMeasurementSets(existingSubmission, validSubmissionMoreMSets, {}, { Authorization: DUMMY_AUTHORIZATION });
-      return Promise.all(promiseArray)
-        .then((promiseOutputs) => {
-          sinon.assert.calledOnce(axiosPutStub);
+          sinon.assert.called(axiosPostStub);
         });
     });
   });
