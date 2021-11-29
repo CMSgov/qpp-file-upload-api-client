@@ -146,7 +146,7 @@ The **develop** branch is considered to be the main branch where the source code
     ```
 
 3. Open a PR into **master** from the release branch.
-4. Merge **master** PR once all checks have passed, get 1 approval from a reviewer as well.
+4. Merge **master** PR once all checks have passed, get 1 approval from a reviewer as well. **Make sure NOT TO SQUASH when merging to preserve commit history**
 5. Draft a new release [GitHub Release Page](https://github.com/CMSgov/qpp-file-upload-api-client/releases).
    1. Click Draft a new release
    2. Select the target as the release branch you created `release/x.x.x`
@@ -158,7 +158,7 @@ The **develop** branch is considered to be the main branch where the source code
    1. Open up the draft release, and verify it is not marked as a pre release
    2. select **publish release** to publish the release
       - The npm-publish action should kick off and publish a new version to [NPM](https://www.npmjs.com/package/qpp-file-upload-api-client?activeTab=versions).
-7. Open a PR into **develop** from **master** to backfill any commits on the release branch that are not in develop.
+7. Open a PR into **develop** from **master** to backfill any commits on the release branch that are not in develop. **Make sure NOT TO SQUASH when merging to preserve commit history**
 
 ### Release Troubleshooting
 
