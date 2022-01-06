@@ -105,9 +105,13 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
           createdMeasurementSets.push(postOrPutOutput);
         }
       });
-      warnings = warnings.reduce((a,b) => {
-        return a !== b ? a : null;
-      });
+      if (warnings && warnings.length > 0) {
+        warnings = warnings.reduce((a,b) => {
+          return a !== b ? a : null;
+        });
+      } else {
+        warnings = null;
+      }
 
       // Call the callback with the aggregated error string and list of measurementSets created
       callback(errs, createdMeasurementSets, warnings);

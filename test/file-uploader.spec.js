@@ -186,7 +186,7 @@ describe('fileUploader', () => {
           throw errs[0];
         }, 'Random Submissions API error');
         assert.strictEqual(mSets.length, 1);
-        assert.deepEqual(mSets[0], measurementSetToCreate);
+        assert.deepEqual(mSets[0].measurementSet, measurementSetToCreate);
       }
     );
   });
