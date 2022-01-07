@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 /*
  * Function for validating a submission Object using the /public/validate-submission
  * endpoint. Returns the validated submission if it was successful -- if there
@@ -146,7 +145,7 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
     headers:baseOptions.headers
   }).then((body) => {
     // Assuming a 200 response here
-    return body.data.data.measurementSet;
+    return body.data.data;
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
@@ -166,7 +165,7 @@ export function postMeasurementSet(measurementSet, baseOptions) {
     headers: baseOptions.headers
   }).then((body) => {
     // Assuming a 201 response here
-    return body.data.data.measurementSet;
+    return body.data.data;
   }).catch(err => {
     return Promise.reject((err && err.response && err.response.data && err.response.data.error) || err);
   });
