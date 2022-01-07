@@ -364,7 +364,7 @@ describe('fileUploaderUtils', () => {
           assert.strictEqual(axiosPutStub.firstCall.args[0], '/measurement-sets/001');
 
           assert.exists(mSet);
-          assert.deepEqual(validSubmission.measurementSets[0], mSet);
+          assert.deepEqual(validSubmission.measurementSets[0], mSet.measurementSet);
         });
     });
 
@@ -389,7 +389,8 @@ describe('fileUploaderUtils', () => {
         resolve({
           data: {
             data: {
-              measurementSet: validSubmission.measurementSets[0]
+              measurementSet: validSubmission.measurementSets[0],
+              warnings: ['test warning']
             }
           }
         });
@@ -401,7 +402,8 @@ describe('fileUploaderUtils', () => {
           assert.strictEqual(axiosPostStub.firstCall.args[0], '/measurement-sets');
 
           assert.exists(mSet);
-          assert.deepEqual(validSubmission.measurementSets[0], mSet);
+          assert.deepEqual(validSubmission.measurementSets[0], mSet.measurementSet);
+          assert.deepEqual(['test warning'], mSet.warnings);
         });
     });
 

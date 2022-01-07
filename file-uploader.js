@@ -94,17 +94,27 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
 
       return Promise.all(caughtPromises);
     }).then((postAndPutOutputs) => {
+      let warnings = [];
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
         if (postOrPutOutput && postOrPutOutput.error) {
           errs.push(postOrPutOutput.error);
+        } else if(postOrPutOutput && postOrPutOutput.warnings) {
+          warnings.push(postOrPutOutput.warnings);
         } else {
           createdMeasurementSets.push(postOrPutOutput);
         }
       });
+      if (warnings && warnings.length > 0) {
+        warnings = warnings.reduce((a,b) => {
+          return a !== b ? a : null;
+        });
+      } else {
+        warnings = null;
+      }
 
       // Call the callback with the aggregated error string and list of measurementSets created
-      callback(errs, createdMeasurementSets);
+      callback(errs, createdMeasurementSets, warnings);
     }).catch((err) => {
       // Call the callback with the aggregated error string and an empty list (no measurementSets created)
       callback([err], []);
