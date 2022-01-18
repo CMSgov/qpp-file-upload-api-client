@@ -22,7 +22,7 @@ jobs:
           node-version: 12
 
       - name: Clear the cache
-        run: npm cache verify
+        run: npm cache clean --force
 
       - name: Install dependencies
         run: npm ci
