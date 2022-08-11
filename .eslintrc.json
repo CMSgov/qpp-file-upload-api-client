@@ -3,6 +3,7 @@
     "node": true,
     "es6": true
   },
+  "root": true,
   "extends": "eslint:recommended",
   "parserOptions": {
     "ecmaVersion": 6,
