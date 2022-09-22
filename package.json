@@ -32,13 +32,13 @@
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
     "axios": "^0.27.2",
+    "babel-preset-env": "^1.7.0",
     "tar": "^6.1.11"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
     "@snyk/protect": "^1.985.0",
     "babel-loader": "^8.2.5",
-    "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.3.4",
     "debug": "^4.3.1",
