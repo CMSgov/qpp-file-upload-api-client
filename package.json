@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
+    "@babel/preset-env": "^7.19.1",
     "axios": "^0.27.2",
-    "babel-preset-env": "^1.7.0",
     "tar": "^6.1.11"
   },
   "devDependencies": {
