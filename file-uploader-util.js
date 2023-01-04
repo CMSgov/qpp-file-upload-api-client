@@ -141,7 +141,10 @@ export function getExistingSubmission(submission, baseOptions) {
  * @return {Object}
  */
 export function putMeasurementSet(measurementSet, baseOptions, measurementSetId) {
-  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, measurementSet, {
+  //if we are using measurementSet.id, we do not need the submissionId
+  delete measurementSet.submissionId;
+
+  return axios.put(baseOptions.url + '/measurement-sets/' + measurementSetId, removeReadOnlyProperties(measurementSet), {
     headers:baseOptions.headers
   }).then((body) => {
     // Assuming a 200 response here
@@ -161,7 +164,7 @@ export function putMeasurementSet(measurementSet, baseOptions, measurementSetId)
  * @return {Object}
  */
 export function postMeasurementSet(measurementSet, baseOptions) {
-  return axios.post(baseOptions.url + '/measurement-sets', measurementSet, {
+  return axios.post(baseOptions.url + '/measurement-sets', removeReadOnlyProperties(measurementSet), {
     headers: baseOptions.headers
   }).then((body) => {
     // Assuming a 201 response here
@@ -286,4 +289,18 @@ function createErrorDetails(type, ...details) {
       path: `$${path ? '.' + path : ''}.${field}`
     };
   });
+}
+
+function isReadOnlyMeasurementSetProperty(propertyName) {
+  return ['suppressed', 'createdAt', 'updatedAt', 'submitterId', 'submitterType', 'version', 'id'].includes(propertyName);
+}
+
+function removeReadOnlyProperties(object) {
+  Object.keys(object).forEach(key => {
+    if (object[key] === null || isReadOnlyMeasurementSetProperty(key)) {
+      delete object[key];
+    }
+  });
+
+  return object;
 }

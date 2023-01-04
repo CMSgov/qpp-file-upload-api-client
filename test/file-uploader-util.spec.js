@@ -38,6 +38,46 @@ const validSubmission = {
   }]
 };
 
+const putSubmissionWithReadyOnlyFields = {
+  programName: 'mips',
+  entityType: 'individual',
+  taxpayerIdentificationNumber: '000123456',
+  nationalProviderIdentifier: '0123456789',
+  performanceYear: 2017,
+  id: 'abc',
+  measurementSets: [{
+    category: 'ia',
+    submissionMethod: 'registry',
+    performanceStart: '2017-01-01',
+    performanceEnd: '2017-06-01',
+    submissionId: 'abc',
+    id: 'some-mset-id',
+    measurements: [{
+      measureId: 'IA_EPA_4',
+      value: true
+    }]
+  }]
+};
+
+const postSubmissionWithReadyOnlyFields = {
+  programName: 'mips',
+  entityType: 'individual',
+  taxpayerIdentificationNumber: '000123456',
+  nationalProviderIdentifier: '0123456789',
+  performanceYear: 2017,
+  measurementSets: [{
+    category: 'ia',
+    submissionMethod: 'registry',
+    performanceStart: '2017-01-01',
+    performanceEnd: '2017-06-01',
+    suppressed: true,
+    measurements: [{
+      measureId: 'IA_EPA_4',
+      value: true
+    }]
+  }]
+};
+
 const cpcPlusSubmission = {
   programName: 'mips',
   entityType: 'individual',
@@ -368,6 +408,27 @@ describe('fileUploaderUtils', () => {
         });
     });
 
+    it('makes a network call to PUT /measurement-sets with nestJs read only properties removed', () => {
+      const axiosPutStub = sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              measurementSet: validSubmission.measurementSets[0]
+            }
+          }
+        });
+      }));
+
+      return putMeasurementSet(putSubmissionWithReadyOnlyFields.measurementSets[0], baseOptions, '001')
+        .then((mSet) => {
+          sinon.assert.calledOnce(axiosPutStub);
+          assert.strictEqual(axiosPutStub.firstCall.args[0], '/measurement-sets/001');
+
+          assert.exists(mSet);
+          assert.deepEqual(validSubmission.measurementSets[0], mSet.measurementSet);
+        });
+    });
+
     it('throws an error if the API returns anything other than a 200', () => {
       sandbox.stub(axios, 'put').returns(new Promise((resolve, reject) => {
         reject(new Error('Random API Error'));
@@ -397,6 +458,29 @@ describe('fileUploaderUtils', () => {
       }));
 
       return postMeasurementSet(validSubmission.measurementSets[0], baseOptions)
+        .then((mSet) => {
+          sinon.assert.calledOnce(axiosPostStub);
+          assert.strictEqual(axiosPostStub.firstCall.args[0], '/measurement-sets');
+
+          assert.exists(mSet);
+          assert.deepEqual(validSubmission.measurementSets[0], mSet.measurementSet);
+          assert.deepEqual(['test warning'], mSet.warnings);
+        });
+    });
+
+    it('makes a network call to POST /measurement-sets with nestJs read only properties removed', () => {
+      const axiosPostStub = sandbox.stub(axios, 'post').returns(new Promise((resolve, reject) => {
+        resolve({
+          data: {
+            data: {
+              measurementSet: validSubmission.measurementSets[0],
+              warnings: ['test warning']
+            }
+          }
+        });
+      }));
+
+      return postMeasurementSet(postSubmissionWithReadyOnlyFields.measurementSets[0], baseOptions)
         .then((mSet) => {
           sinon.assert.calledOnce(axiosPostStub);
           assert.strictEqual(axiosPostStub.firstCall.args[0], '/measurement-sets');
