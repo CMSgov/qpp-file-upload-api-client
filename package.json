@@ -1,6 +1,6 @@
 {
   "name": "qpp-file-upload-api-client",
-  "version": "1.4.13",
+  "version": "1.4.16",
   "description": "An npm package to send the necessary requests to the Submissions API to execute the functionality required by a file upload client",
   "main": "./dist/index.js",
   "types": "index.d.ts",
@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/CMSgov/qpp-file-upload-api-client#readme",
   "dependencies": {
-    "axios": "^1.7.4",
-    "tar": "^6.1.13"
+    "axios": "^1.8.3",
+    "tar": "^6.2.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
