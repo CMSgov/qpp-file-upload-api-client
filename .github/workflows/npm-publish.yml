@@ -4,6 +4,10 @@ on:
   release:
     types: [ released ]
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
 
   publish-npm:
@@ -12,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.17.0
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
@@ -31,5 +35,3 @@ jobs:
 
       - name: Publish to NPMJS
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
