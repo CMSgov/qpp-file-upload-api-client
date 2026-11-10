@@ -33,17 +33,13 @@ export type SbmUploadMeasurementSetResultWarning = string;
 
 export type SbmUploadMeasurementSetResultError =
   | {
-      timestamp: string;
-      path: string;
-      statusCode: number;
       type: string;
       message: string;
-      error: string;
-    }
-  | {
-      type: string;
-      message: string;
-      details: {
+      error?: string;
+      timestamp?: string;
+      path?: string;
+      statusCode?: number;
+      details?: {
         message: string;
         path: string;
       }[];
@@ -55,11 +51,7 @@ export function fileUploader(
   submissionFormat: 'JSON' | 'XML',
   requestHeaders: Record<string, string>,
   baseSubmissionURL: string,
-  callback: (
-    errors: SbmUploadMeasurementSetResultError[],
-    createdMeasurementSets: SbmUploadMeasurementSetResult[],
-    warnings?: SbmUploadMeasurementSetResultWarning[] | null
-  ) => void
+  callback: (errors: any, createdMeasurementSets: any, warnings?: any) => void
 ): Promise<void>;
 
 export function fileUploaderWithOptions(options: {
