@@ -1,20 +1,37 @@
 import { fileUploaderUtil } from './file-uploader-util';
 
-/*
+/**
+ * @deprecated Use fileUploaderWithOptions instead.
+ */
+export function fileUploader(
+  submissionBody,
+  submissionFormat,
+  requestHeaders,
+  baseSubmissionURL,
+  callback
+) {
+  return fileUploaderWithOptions({
+    submissionBody,
+    submissionFormat,
+    requestHeaders,
+    baseSubmissionURL,
+  })
+    .then((result) => {
+      callback(result.errors, result.createdMeasurementSets, result.warnings);
+    })
+    .catch((err) => {
+      callback([err], []);
+    });
+}
+
+/**
  * Main function to be exported from this file. Calls individual functions to
  * parse the submission body given, validate it with the POST /public/validate-submission
  * endpoint, look for an existing submission matching the file's submission's parameters,
  * and then POST or PUT measurementSets from the file.
  *
- * @param {String} submissionBody
- * @param {String} submissionFormat ('JSON' or 'XML')
- * @param {Object} requestHeaders
- * @param {String} baseSubmissionURL
- * @param {Function} callback
- *
- * @return {Promise}
- *
  * Note: Error Format
+ * ```json
  * {
  * "error": {
  *   "type": "ValidationError",
@@ -30,9 +47,24 @@ import { fileUploaderUtil } from './file-uploader-util';
  *     }
  *   ]
  * }
- *}
+ * ```
+ * @param {Object} options The options for the uploader
+ * @param {unknown} options.submissionBody
+ * @param {String} options.submissionFormat ('JSON' or 'XML')
+ * @param {Object} options.requestHeaders
+ * @param {String} options.baseSubmissionURL
+ * @param {String} options.sessionId The session ID that the file should be associated with
+ * @param {String} options.fileId The ID of the file being uploaded
  */
-export function fileUploader(submissionBody, submissionFormat, requestHeaders, baseSubmissionURL, callback) {
+export async function fileUploaderWithOptions(options) {
+  const {
+    submissionBody,
+    submissionFormat,
+    requestHeaders,
+    baseSubmissionURL,
+    sessionId,
+    fileId,
+  } = options;
   let validatedSubmission;
   let existingSubmission;
   const errs = [];
@@ -40,20 +72,40 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
 
   const baseOptions = {
     url: baseSubmissionURL,
-    headers: Object.assign({
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }, requestHeaders)
+    headers: Object.assign(
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      requestHeaders
+    ),
   };
 
-  return fileUploaderUtil.validateSubmission(submissionBody, submissionFormat, baseOptions)
+  const fileIdentifiers = sessionId && fileId ? { sessionId, fileId } : null;
+
+  return fileUploaderUtil
+    .validateSubmission(submissionBody, submissionFormat, baseOptions)
     .then((_validSubmission) => {
       // QPPSF-5596, part of the validation logic for NonProportion measures for PY 2019, is to add a new field during validation,
       // to prevent additional fields being added, we are going to send the original submission object
       // to the api since the validation adds some validation properties
-      validatedSubmission = typeof submissionBody === 'string' ? JSON.parse(submissionBody) : submissionBody;
-      return fileUploaderUtil.getExistingSubmission(validatedSubmission, baseOptions);
-    }).then((existingSubmissionReturned) => {
+      validatedSubmission =
+        typeof submissionBody === 'string'
+          ? JSON.parse(submissionBody)
+          : submissionBody;
+
+      // if we have file identifiers, attach them to each measurement set
+      if (fileIdentifiers && validatedSubmission.measurementSets) {
+        validatedSubmission.measurementSets.forEach((set) => {
+          Object.assign(set, fileIdentifiers);
+        });
+      }
+      return fileUploaderUtil.getExistingSubmission(
+        validatedSubmission,
+        baseOptions
+      );
+    })
+    .then((existingSubmissionReturned) => {
       existingSubmission = existingSubmissionReturned;
       let firstMeasurementSetPromise;
 
@@ -62,19 +114,31 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
       // with other POST /measurement-sets calls to create the submission, which can cause
       // errors
       if (!existingSubmission) {
-        const firstMeasurementSet = Object.assign({}, validatedSubmission.measurementSets.pop(), {submission: {
-          programName: validatedSubmission.programName,
-          entityType: validatedSubmission.entityType,
-          entityId: validatedSubmission.entityId || null,
-          taxpayerIdentificationNumber: validatedSubmission.taxpayerIdentificationNumber || null,
-          nationalProviderIdentifier: validatedSubmission.nationalProviderIdentifier || null,
-          performanceYear: validatedSubmission.performanceYear
-        }});
-        firstMeasurementSetPromise = fileUploaderUtil.postMeasurementSet(firstMeasurementSet, baseOptions);
+        const firstMeasurementSet = Object.assign(
+          {},
+          validatedSubmission.measurementSets.pop(),
+          {
+            submission: {
+              programName: validatedSubmission.programName,
+              entityType: validatedSubmission.entityType,
+              entityId: validatedSubmission.entityId || null,
+              taxpayerIdentificationNumber:
+                validatedSubmission.taxpayerIdentificationNumber || null,
+              nationalProviderIdentifier:
+                validatedSubmission.nationalProviderIdentifier || null,
+              performanceYear: validatedSubmission.performanceYear,
+            },
+          }
+        );
+        firstMeasurementSetPromise = fileUploaderUtil.postMeasurementSet(
+          firstMeasurementSet,
+          baseOptions
+        );
       }
 
       return firstMeasurementSetPromise;
-    }).then((firstMeasurementSetOutput) => {
+    })
+    .then((firstMeasurementSetOutput) => {
       // If we did fire off the first POST /measurement-sets call and it worked (because
       // no error was thrown), then store the output here
       if (firstMeasurementSetOutput) {
@@ -82,31 +146,39 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
       }
 
       // Submit all remaining measurementSets
-      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(existingSubmission, validatedSubmission, baseOptions, requestHeaders);
+      const postAndPutPromises = fileUploaderUtil.submitMeasurementSets(
+        existingSubmission,
+        validatedSubmission,
+        baseOptions,
+        requestHeaders
+      );
 
       // Transform rejected promises into Errors so they are caught and don't short-circuit
       // the others
-      const caughtPromises = postAndPutPromises.map(promise => promise.catch(err => {
-        return {
-          error: err
-        };
-      }));
+      const caughtPromises = postAndPutPromises.map((promise) =>
+        promise.catch((err) => {
+          return {
+            error: err,
+          };
+        })
+      );
 
       return Promise.all(caughtPromises);
-    }).then((postAndPutOutputs) => {
+    })
+    .then((postAndPutOutputs) => {
       let warnings = [];
       // Aggregate the errors and created measurementSets
       postAndPutOutputs.forEach((postOrPutOutput) => {
         if (postOrPutOutput && postOrPutOutput.error) {
           errs.push(postOrPutOutput.error);
-        } else if(postOrPutOutput && postOrPutOutput.warnings) {
+        } else if (postOrPutOutput && postOrPutOutput.warnings) {
           warnings.push(postOrPutOutput.warnings);
         } else {
           createdMeasurementSets.push(postOrPutOutput);
         }
       });
       if (warnings && warnings.length > 0) {
-        warnings = warnings.reduce((a,b) => {
+        warnings = warnings.reduce((a, b) => {
           return a !== b ? a : null;
         });
       } else {
@@ -114,9 +186,13 @@ export function fileUploader(submissionBody, submissionFormat, requestHeaders, b
       }
 
       // Call the callback with the aggregated error string and list of measurementSets created
-      callback(errs, createdMeasurementSets, warnings);
-    }).catch((err) => {
-      // Call the callback with the aggregated error string and an empty list (no measurementSets created)
-      callback([err], []);
+      return {
+        errors: errs,
+        createdMeasurementSets: createdMeasurementSets,
+        warnings: warnings,
+      };
+    })
+    .catch((err) => {
+      throw err;
     });
 }
