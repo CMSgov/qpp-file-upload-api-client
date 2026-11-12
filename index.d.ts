@@ -40,12 +40,16 @@ export type SbmUploadMeasurementSetResultError =
       path?: string;
       statusCode?: number;
       details?: {
-        message: string;
-        path: string;
+        message?: string;
+        path?: string;
+        submissionId?: string;
       }[];
     }
   | Error;
 
+/**
+ * @deprecated Use `fileUploaderWithOptions` instead.
+ */
 export function fileUploader(
   submissionBody: string | object,
   submissionFormat: 'JSON' | 'XML',
