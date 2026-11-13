@@ -1,9 +1,9 @@
 /*
  * Module Dependencies
  */
-import { fileUploader } from './file-uploader';
+import { fileUploader, fileUploaderWithOptions } from './file-uploader';
 
 /*
  * Module Exports
  */
-export { fileUploader };
+export { fileUploader, fileUploaderWithOptions };
